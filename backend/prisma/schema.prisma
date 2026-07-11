@@ -121,3 +121,198 @@ model Otp {
   @@index([userId])
   @@index([code])
 }
+
+model ProductCategory {
+  id          String   @id @default(cuid())
+
+  name        String   @unique
+  slug        String   @unique
+
+  description String?
+  image       String?
+
+  status      Boolean  @default(true)
+
+  parentId    String?
+
+  parent ProductCategory? @relation("CategoryTree", fields: [parentId], references: [id])
+  children ProductCategory[] @relation("CategoryTree")
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+}
+
+model ProductBrand {
+  id          String @id @default(cuid())
+
+  name        String @unique
+  slug        String @unique
+
+  logo        String?
+
+  description String?
+
+  status Boolean @default(true)
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductType {
+  id String @id @default(cuid())
+
+  name String @unique
+
+  slug String @unique
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductBase {
+  id String @id @default(cuid())
+
+  name String @unique
+
+  slug String @unique
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+} 
+
+model ProductBadge {
+  id String @id @default(cuid())
+
+  name String @unique
+
+  slug String @unique
+
+  color String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductSize {
+  id String @id @default(cuid())
+
+  name String @unique
+
+  variants ProductVariant[]
+
+  createdAt DateTime @default(now())
+}
+
+model ProductColor {
+  id String @id @default(cuid())
+
+  name String @unique
+
+  hexCode String?
+
+  variants ProductVariant[]
+
+  createdAt DateTime @default(now())
+}
+
+model ProductWeight {
+  id String @id @default(cuid())
+
+  value Decimal
+
+  unit String
+
+  variants ProductVariant[]
+
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id String @id @default(cuid())
+
+  name String
+  slug String @unique
+
+  shortDescription String?
+  description String?
+
+  status Boolean @default(true)
+
+  categoryId String
+  brandId String?
+  typeId String
+  baseId String?
+  badgeId String?
+
+  category ProductCategory @relation(fields: [categoryId], references: [id])
+  brand ProductBrand? @relation(fields: [brandId], references: [id])
+  type ProductType @relation(fields: [typeId], references: [id])
+  base ProductBase? @relation(fields: [baseId], references: [id])
+  badge ProductBadge? @relation(fields: [badgeId], references: [id])
+
+  variants ProductVariant[]
+  images ProductImage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductVariant {
+  id String @id @default(cuid())
+
+  sku String @unique
+
+  price Decimal
+
+  comparePrice Decimal?
+
+  stock Int
+
+  productId String
+
+  sizeId String?
+
+  colorId String?
+
+  weightId String?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  size ProductSize? @relation(fields: [sizeId], references: [id])
+
+  color ProductColor? @relation(fields: [colorId], references: [id])
+
+  weight ProductWeight? @relation(fields: [weightId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductImage {
+  id String @id @default(cuid())
+
+  imageUrl String
+
+  publicId String?
+
+  isPrimary Boolean @default(false)
+
+  productId String
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
