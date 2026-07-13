@@ -24,3 +24,14 @@ export const createCategorySchema = z.object({
     .cuid("Invalid parent category ID.")
     .optional(),
 });
+export const updateCategorySchema = z.object({
+  name: z.string().trim().min(3).max(100),
+
+  description: z.string().trim().optional(),
+
+  image: z.string().trim().optional(),
+
+  status: z.boolean().optional(),
+
+  parentId: z.string().cuid().nullable().optional(),
+});
