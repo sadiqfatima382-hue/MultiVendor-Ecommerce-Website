@@ -1,5 +1,5 @@
 import express from "express";
-import {validate} from "../middlewares/validate.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
 import { createBrandSchema, updateBrandSchema, } from "../validators/auth/brand.validation.js";
 import { createBrand, getBrands, getBrandById, updateBrand, deleteBrand, } from "../controllers/brand.controller.js";
 

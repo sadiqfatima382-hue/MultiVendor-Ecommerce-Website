@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import authRoutes from "./routes/auth.routes.js";
 import brandRoutes from "./routes/brand.routes.js";
+import productTypeRoutes from"./routes/productType.routes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/brands", brandRoutes);
+app.use("/api/product-types", productTypeRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
