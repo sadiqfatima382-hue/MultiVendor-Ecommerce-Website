@@ -6,7 +6,7 @@ export async function createproductBase(req, res, next) {
 
         return res.status(201).json({
             success: true,
-            message: "Product type created successfully.",
+            message: "Product base created successfully.",
             data: productBase,
         });
     } catch (error) {
@@ -20,7 +20,7 @@ export async function getproductBases(req, res, next) {
 
         return res.status(200).json({
             success: true,
-            message: "Product types fetched successfully.",
+            message: "Product base fetched successfully.",
             data: result.productBases,
             pagination: result.pagination,
         });
@@ -35,7 +35,7 @@ export async function getproductBaseById(req, res, next) {
 
         return res.status(200).json({
             success: true,
-            message: "Product type fetched successfully.",
+            message: "Product base fetched successfully.",
             data: productBase,
         });
     } catch (error) {
@@ -52,7 +52,7 @@ export async function updateproductBase(req, res, next) {
 
         return res.status(200).json({
             success: true,
-            message: "Product type updated successfully.",
+            message: "Product base updated successfully.",
             data: productBase,
         });
     } catch (error) {
@@ -66,7 +66,7 @@ export async function deleteproductBase(req, res, next) {
 
         return res.status(200).json({
             success: true,
-            message: "Product type deleted successfully.",
+            message: "Product base deleted successfully.",
         });
     } catch (error) {
         next(error);
