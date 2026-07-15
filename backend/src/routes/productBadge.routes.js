@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/create", validate(createProductBadgeSchema), createproductBadge);
 
-router.get("/", getproductBadges);
+router.get("/get", getproductBadges);
 
 router.get("/:id", getproductBadgeById);
 

@@ -1,6 +1,5 @@
 import { generateSlug } from "../utils/slug.js";
 import { getPagination } from "../utils/pagination.js";
-
 import { findproductBadgeById, findproductBadgeByName, findproductBadgeBySlug, createproductBadge, findproductBadges, countproductBadges, updateproductBadge, deleteproductBadge, } from "../repositories/productBadge.repository.js";
 
 export async function createproductBadgeService(data) {
