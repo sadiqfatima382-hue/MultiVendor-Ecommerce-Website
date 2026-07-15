@@ -13,7 +13,7 @@ export async function createproductColorService(data) {
 
     return createproductColor({
         name,
-        color: data.color,
+        hexCode: data.hexCode,
     });
 }
 

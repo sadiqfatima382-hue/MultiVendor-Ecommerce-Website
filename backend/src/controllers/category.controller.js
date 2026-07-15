@@ -11,7 +11,11 @@ export async function createCategory(req, res, next) {
       data: category,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      data: category,
+    });
   }
 }
 
@@ -25,7 +29,11 @@ export async function getCategoryById(req, res, next) {
       data: category,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      data: category,
+    });
   }
 }
 
@@ -42,7 +50,11 @@ export async function updateCategory(req, res, next) {
       data: category,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      data: category,
+    });
   }
 }
 
@@ -55,6 +67,9 @@ export async function deleteCategory(req, res, next) {
       message: "Category deleted successfully.",
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }

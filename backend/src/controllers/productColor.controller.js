@@ -10,7 +10,10 @@ export async function createproductColor(req, res, next) {
             data: productColor,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
 }
 
@@ -25,8 +28,13 @@ export async function getproductColors(req, res, next) {
             pagination: result.pagination,
         });
     } catch (error) {
-        next(error);
-    }
+         return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: result.productColors,
+            pagination: result.pagination,
+    });
+}
 }
 
 export async function getproductColorById(req, res, next) {
@@ -39,7 +47,11 @@ export async function getproductColorById(req, res, next) {
             data: productColor,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productColor,
+        });
     }
 }
 
@@ -56,7 +68,11 @@ export async function updateproductColor(req, res, next) {
             data: productColor,
         });
     } catch (error) {
-        next(error);
+          return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productColor,
+        });
     }
 }
 
@@ -69,6 +85,9 @@ export async function deleteproductColor(req, res, next) {
             message: "Product Color deleted successfully.",
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
 }

@@ -10,7 +10,11 @@ export async function createProductType(req, res, next) {
             data: productType,
         });
     } catch (error) {
-        next(error);
+         return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productType,
+        });
     }
 }
 
@@ -25,7 +29,12 @@ export async function getProductTypes(req, res, next) {
             pagination: result.pagination,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: result.productTypes,
+            pagination: result.pagination,
+        });
     }
 }
 
@@ -39,7 +48,11 @@ export async function getProductTypeById(req, res, next) {
             data: productType,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productType,
+        });
     }
 }
 
@@ -56,7 +69,11 @@ export async function updateProductType(req, res, next) {
             data: productType,
         });
     } catch (error) {
-        next(error);
+         return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productType,
+        });
     }
 }
 
@@ -69,6 +86,9 @@ export async function deleteProductType(req, res, next) {
             message: "Product type deleted successfully.",
         });
     } catch (error) {
-        next(error);
+         return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
 }

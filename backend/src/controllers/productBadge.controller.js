@@ -10,7 +10,11 @@ export async function createproductBadge(req, res, next) {
             data: productBadge,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productBadge,
+        });
     }
 }
 
@@ -25,7 +29,12 @@ export async function getproductBadges(req, res, next) {
             pagination: result.pagination,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: result.productBadges,
+            pagination: result.pagination,
+        });
     }
 }
 
@@ -39,7 +48,11 @@ export async function getproductBadgeById(req, res, next) {
             data: productBadge,
         });
     } catch (error) {
-        next(error);
+         return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productBadge,
+        });
     }
 }
 
@@ -56,7 +69,11 @@ export async function updateproductBadge(req, res, next) {
             data: productBadge,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: productBadge,
+        });
     }
 }
 
@@ -69,6 +86,9 @@ export async function deleteproductBadge(req, res, next) {
             message: "Product badge deleted successfully.",
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
 }

@@ -12,7 +12,11 @@ export async function register(req, res, next) {
       data: result,
     });
   } catch (error) {
-    next(error);
+   return res.status(500).json({
+      success: false,
+      message: error.message,
+      data: result,
+    });
   }
 }
 
@@ -26,7 +30,11 @@ export async function login(req, res, next) {
       data: result,
     });
   } catch (error) {
-    next(error);
+   return res.status(500).json({
+      success: false,
+      message: error.message,
+      data: result,
+    });
   }
 }
 
@@ -47,7 +55,11 @@ export async function refreshToken(req, res, next) {
       data: result,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      data: result,
+    });
   }
 }
 export async function logout(req, res, next) {
@@ -59,6 +71,9 @@ export async function logout(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    next(error);
+     return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }
