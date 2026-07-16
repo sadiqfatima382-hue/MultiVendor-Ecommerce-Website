@@ -9,6 +9,7 @@ import productBaseRoutes from"./routes/productBase.routes.js";
 import productBadgeRoutes from"./routes/productBadge.routes.js";
 import productColorRoutes from "./routes/productColor.routes.js";
 import productSizeRoutes from "./routes/productSize.routes.js";
+import productWeightRoutes from "./routes/productWeight.routes.js";
 const app = express();
 
 // Middleware
@@ -24,6 +25,7 @@ app.use("/api/product-base", productBaseRoutes);
 app.use("/api/product-badge", productBadgeRoutes);
 app.use("/api/product-color", productColorRoutes);
 app.use("/api/product-size", productSizeRoutes);
+app.use("/api/product-weight", productWeightRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
