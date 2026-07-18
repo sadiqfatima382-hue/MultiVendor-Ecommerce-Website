@@ -12,6 +12,13 @@ enum UserStatus {
   SUSPENDED
 }
 
+enum VendorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
 enum OTPType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
@@ -80,7 +87,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  vendor Vendor?
   @@index([roleId])
   @@index([email])
 }
@@ -267,6 +274,10 @@ model Product {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  vendorId String?
+
+vendor Vendor? @relation(fields: [vendorId], references: [id])
 }
 
 model ProductVariant {
@@ -316,4 +327,32 @@ model ProductImage {
   createdAt DateTime @default(now())
 }
 
+model Vendor {
+  id String @id @default(cuid())
 
+  businessName String
+  slug String @unique
+
+  description String?
+
+  logo String?
+  logoPublicId String?
+
+  phone String?
+  email String?
+
+  address String?
+  city String?
+  country String?
+
+  status VendorStatus @default(PENDING)
+
+  ownerId String @unique
+
+  owner User @relation(fields: [ownerId], references: [id])
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

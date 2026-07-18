@@ -14,7 +14,7 @@ export async function createproductBase(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: productBase,
+            
         });
     }
 }
@@ -33,8 +33,7 @@ export async function getproductBases(req, res, next) {
          return res.status(500).json({
             success: false,
             message: error.message,
-            data: result.productBases,
-            pagination: result.pagination,
+            
         });
     }
 }
@@ -52,7 +51,7 @@ export async function getproductBaseById(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: productBase,
+           
         });
     }
 }
@@ -73,7 +72,7 @@ export async function updateproductBase(req, res, next) {
          return res.status(500).json({
             success: false,
             message: error.message,
-            data: productBase,
+            
         });
     }
 }

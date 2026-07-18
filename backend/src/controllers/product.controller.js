@@ -13,7 +13,7 @@ export async function createProduct(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: product,
+            
         });
     }
 }
@@ -31,7 +31,7 @@ export async function getProducts(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: products,
+            
         });
     }
 }
@@ -49,7 +49,7 @@ export async function getProductById(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: product,
+            
         });
     }
 }
@@ -70,7 +70,7 @@ export async function updateProduct(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: product,
+            
         });
     }
 }

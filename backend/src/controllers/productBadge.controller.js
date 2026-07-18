@@ -13,7 +13,7 @@ export async function createproductBadge(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: productBadge,
+           
         });
     }
 }
@@ -32,8 +32,7 @@ export async function getproductBadges(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: result.productBadges,
-            pagination: result.pagination,
+           
         });
     }
 }
@@ -51,7 +50,7 @@ export async function getproductBadgeById(req, res, next) {
          return res.status(500).json({
             success: false,
             message: error.message,
-            data: productBadge,
+            
         });
     }
 }
@@ -72,7 +71,7 @@ export async function updateproductBadge(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: productBadge,
+            
         });
     }
 }

@@ -31,8 +31,7 @@ export async function getproductColors(req, res, next) {
          return res.status(500).json({
             success: false,
             message: error.message,
-            data: result.productColors,
-            pagination: result.pagination,
+            
     });
 }
 }
@@ -50,7 +49,7 @@ export async function getproductColorById(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: productColor,
+            
         });
     }
 }
@@ -71,7 +70,7 @@ export async function updateproductColor(req, res, next) {
           return res.status(500).json({
             success: false,
             message: error.message,
-            data: productColor,
+            
         });
     }
 }

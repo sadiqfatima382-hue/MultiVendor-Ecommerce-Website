@@ -13,7 +13,7 @@ export async function createBrand(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: brand,
+          
         });
     }
 }
@@ -32,8 +32,7 @@ export async function getBrands(req, res, next) {
          return res.status(500).json({
             success: false,
             message: error.message,
-            data: result.brands,
-            pagination: result.pagination,
+          
         });
     }
 }
@@ -51,7 +50,7 @@ export async function getBrandById(req, res, next) {
          return res.status(500).json({
             success: false,
             message: error.message,
-            data: brand,
+            
         });
     }
 }
@@ -72,7 +71,7 @@ export async function updateBrand(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: brand,
+            
         });
     }
 }

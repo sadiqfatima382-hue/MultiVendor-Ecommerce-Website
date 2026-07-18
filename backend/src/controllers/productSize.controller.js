@@ -31,8 +31,7 @@ export async function getproductSizes(req, res, next) {
          return res.status(500).json({
             success: false,
             message: error.message,
-            data: result.productSizes,
-            pagination: result.pagination,
+           
     });
 }
 }
@@ -50,7 +49,7 @@ export async function getproductSizeById(req, res, next) {
         return res.status(500).json({
             success: false,
             message: error.message,
-            data: productSize,
+            
         });
     }
 }
@@ -71,7 +70,7 @@ export async function updateproductSize(req, res, next) {
           return res.status(500).json({
             success: false,
             message: error.message,
-            data: productSize,
+            
         });
     }
 }

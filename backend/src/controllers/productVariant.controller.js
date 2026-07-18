@@ -1,10 +1,4 @@
-import {
-  createProductVariantService,
-  getProductVariantsService,
-  getProductVariantByIdService,
-  updateProductVariantService,
-  deleteProductVariantService,
-} from "../services/productVariant.service.js";
+import { createProductVariantService, getProductVariantsService, getProductVariantByIdService, updateProductVariantService, deleteProductVariantService, } from "../services/productVariant.service.js";
 
 export async function createProductVariant(req, res, next) {
   try {
@@ -16,7 +10,10 @@ export async function createProductVariant(req, res, next) {
       data: variant,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }
 
@@ -30,7 +27,10 @@ export async function getProductVariants(req, res, next) {
       data: variants,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }
 
@@ -44,7 +44,11 @@ export async function getProductVariantById(req, res, next) {
       data: variant,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+
+    });
   }
 }
 
@@ -61,7 +65,11 @@ export async function updateProductVariant(req, res, next) {
       data: variant,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+
+    });
   }
 }
 
@@ -74,6 +82,9 @@ export async function deleteProductVariant(req, res, next) {
       message: "Product Variant deleted successfully.",
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }

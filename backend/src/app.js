@@ -13,6 +13,8 @@ import productWeightRoutes from "./routes/productWeight.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import productVariantRoutes from "./routes/productVariant.routes.js";
 import productImageRoutes from "./routes/productImage.routes.js";
+import vendorRoutes from "./routes/vendor.routes.js";
+
 
 
 const app = express();
@@ -34,6 +36,7 @@ app.use("/api/product-weight", productWeightRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/product-variants", productVariantRoutes);
 app.use("/api/product-images", productImageRoutes);
+app.use("/api/vendors", vendorRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({

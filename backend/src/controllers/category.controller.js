@@ -14,7 +14,7 @@ export async function createCategory(req, res, next) {
     return res.status(500).json({
       success: false,
       message: error.message,
-      data: category,
+      
     });
   }
 }
@@ -32,7 +32,7 @@ export async function getCategoryById(req, res, next) {
     return res.status(500).json({
       success: false,
       message: error.message,
-      data: category,
+      
     });
   }
 }
@@ -53,7 +53,7 @@ export async function updateCategory(req, res, next) {
     return res.status(500).json({
       success: false,
       message: error.message,
-      data: category,
+      
     });
   }
 }

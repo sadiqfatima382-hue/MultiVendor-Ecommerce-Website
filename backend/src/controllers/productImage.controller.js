@@ -15,7 +15,7 @@ export async function createProductImage(req, res, next) {
     return res.status(500).json({
       success: false,
       message: error.message,
-      data: image,
+     
     });
   }
 }
@@ -33,7 +33,7 @@ export async function getProductImages(req, res, next) {
      return res.status(500).json({
       success: false,
       message: error.message,
-      data: images,
+      
     });
   }
 }
@@ -51,7 +51,7 @@ export async function setPrimaryImage(req, res, next) {
     return res.status(500).json({
       success: false,
       message: error.message,
-      data: image,
+      
     });
   }
 }
