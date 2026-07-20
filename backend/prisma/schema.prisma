@@ -19,6 +19,15 @@ enum VendorStatus {
   SUSPENDED
 }
 
+enum ProductStatus {
+  DRAFT
+  PENDING_APPROVAL
+  ACTIVE
+  INACTIVE
+  REJECTED
+  ARCHIVED
+}
+
 enum OTPType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
@@ -255,7 +264,7 @@ model Product {
   shortDescription String?
   description String?
 
-  status Boolean @default(true)
+  status ProductStatus @default(DRAFT)
 
   categoryId String
   brandId String?

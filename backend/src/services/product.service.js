@@ -99,8 +99,11 @@ export async function getProductsService(query) {
         ];
     }
 
-    if (status !== undefined) {
-        where.status = status === "true";
+    // if (status !== undefined) {
+    //     where.status = status === "true";
+    // }
+     if (status) {
+        where.status = status ;
     }
 
     if (categoryId) {

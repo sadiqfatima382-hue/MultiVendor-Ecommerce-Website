@@ -59,6 +59,15 @@ export async function createVendorService(data) {
     country,
     ownerId,
   });
+  const vendorRole = await findRoleByName("VENDOR");
+
+if (!vendorRole) {
+  throw new Error("VENDOR role not found.");
+}
+
+await updateUserRole(ownerId, vendorRole.id);
+
+return vendor;
 }
 
 export async function getVendorsService(query) {

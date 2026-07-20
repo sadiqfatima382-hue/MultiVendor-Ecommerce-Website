@@ -19,9 +19,12 @@ export const createProductSchema = z.object({
     .max(5000, "Description cannot exceed 5000 characters")
     .optional(),
 
-  status: z
-    .boolean()
-    .optional(),
+  status: z.enum([
+    "DRAFT",
+    "ACTIVE",
+    "INACTIVE",
+    "ARCHIVED",
+  ]).optional(),
 
   categoryId: z
     .string()

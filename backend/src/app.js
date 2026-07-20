@@ -14,6 +14,8 @@ import productRoutes from "./routes/product.routes.js";
 import productVariantRoutes from "./routes/productVariant.routes.js";
 import productImageRoutes from "./routes/productImage.routes.js";
 import vendorRoutes from "./routes/vendor.routes.js";
+import vendorDashboardRoutes from "./routes/vendorDashboard.routes.js";
+
 
 
 
@@ -37,6 +39,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/product-variants", productVariantRoutes);
 app.use("/api/product-images", productImageRoutes);
 app.use("/api/vendors", vendorRoutes);
+app.use("/api/vendor/dashboard", vendorDashboardRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({

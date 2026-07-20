@@ -53,7 +53,12 @@ export async function findRefreshToken(token) {
     },
   });
 }
-
+export async function updateUserRole(userId, roleId) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { roleId },
+  });
+}
 export async function deleteRefreshToken(token) {
   return prisma.refreshToken.deleteMany({
     where: {

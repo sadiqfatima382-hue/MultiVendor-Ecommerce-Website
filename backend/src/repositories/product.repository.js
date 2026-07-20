@@ -195,3 +195,108 @@ export async function findProductBadgeById(id) {
         where: { id },
     });
 }
+
+//Vendor Product repository 
+
+export async function findVendorProducts({
+  vendorId,
+  skip,
+  take,
+  where,
+  orderBy,
+}) {
+  return prisma.product.findMany({
+    where: {
+      vendorId,
+      ...where,
+    },
+    skip,
+    take,
+    orderBy,
+
+    include: {
+      category: true,
+      brand: true,
+      type: true,
+      base: true,
+      badge: true,
+      variants: true,
+      images: true,
+    },
+  });
+}
+
+export async function findVendorProductById(
+  vendorId,
+  productId
+) {
+  return prisma.product.findFirst({
+    where: {
+      id: productId,
+      vendorId,
+    },
+
+    include: {
+      category: true,
+      brand: true,
+      type: true,
+      base: true,
+      badge: true,
+      variants: true,
+      images: true,
+    },
+  });
+}
+
+export async function countVendorProducts(
+  vendorId,
+  where = {}
+) {
+  return prisma.product.count({
+    where: {
+      vendorId,
+      ...where,
+    },
+  });
+}
+
+export async function countLowStockProducts(
+  vendorId
+) {
+  return prisma.productVariant.count({
+    where: {
+      product: {
+        vendorId,
+      },
+
+      stock: {
+        lte: 5,
+      },
+    },
+  });
+}
+
+export async function countOutOfStockProducts(
+  vendorId
+) {
+  return prisma.productVariant.count({
+    where: {
+      product: {
+        vendorId,
+      },
+
+      stock: 0,
+    },
+  });
+}
+
+export async function submitProduct(productId) {
+  return prisma.product.update({
+    where: {
+      id: productId,
+    },
+    data: {
+      status: "PENDING_APPROVAL",
+    },
+  });
+}
