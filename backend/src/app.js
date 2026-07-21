@@ -15,8 +15,7 @@ import productVariantRoutes from "./routes/productVariant.routes.js";
 import productImageRoutes from "./routes/productImage.routes.js";
 import vendorRoutes from "./routes/vendor.routes.js";
 import vendorDashboardRoutes from "./routes/vendorDashboard.routes.js";
-
-
+import vendorConfigRoutes from "./routes/vendorConfig.routes.js";
 
 
 const app = express();
@@ -40,6 +39,7 @@ app.use("/api/product-variants", productVariantRoutes);
 app.use("/api/product-images", productImageRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/vendor/dashboard", vendorDashboardRoutes);
+app.use("/api/vendor/config", vendorConfigRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({

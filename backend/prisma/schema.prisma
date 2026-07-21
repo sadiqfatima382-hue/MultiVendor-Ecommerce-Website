@@ -361,6 +361,40 @@ model Vendor {
   owner User @relation(fields: [ownerId], references: [id])
 
   products Product[]
+  config VendorConfig?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VendorConfig {
+  id String @id @default(cuid())
+
+  logo String?
+  banner String?
+
+  storeDescription String?
+
+  businessEmail String?
+  businessPhone String?
+
+  facebook String?
+  instagram String?
+  twitter String?
+  linkedin String?
+  youtube String?
+
+  returnPolicy String?
+  shippingPolicy String?
+  privacyPolicy String?
+  termsConditions String?
+
+  metaTitle String?
+  metaDescription String?
+  metaKeywords String?
+
+  vendorId String @unique
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
