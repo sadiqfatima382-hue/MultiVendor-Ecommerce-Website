@@ -1,5 +1,5 @@
 import {  findVendorById,  findVendorByBusinessName,  findVendorBySlug,  findVendorByOwnerId,  createVendor,  findVendors,  countVendors,  updateVendor,  deleteVendor,} from "../repositories/vendor.repository.js";
-import { findUserById } from "../repositories/auth.repository.js";
+import { findUserById, findRoleByName, updateUserRole } from "../repositories/auth.repository.js";
 import { generateSlug } from "../utils/slug.js";
 import { getPagination } from "../utils/pagination.js";
 
@@ -48,7 +48,8 @@ export async function createVendorService(data) {
     throw new Error("This user already owns a vendor.");
   }
 
-  return createVendor({
+  // ✅ Create vendor
+  const vendor = await createVendor({
     businessName: normalizedBusinessName,
     slug,
     description,
@@ -59,15 +60,18 @@ export async function createVendorService(data) {
     country,
     ownerId,
   });
+
+  // ✅ Find VENDOR role
   const vendorRole = await findRoleByName("VENDOR");
 
-if (!vendorRole) {
-  throw new Error("VENDOR role not found.");
-}
+  if (!vendorRole) {
+    throw new Error("VENDOR role not found.");
+  }
 
-await updateUserRole(ownerId, vendorRole.id);
+  // ✅ Update user's role
+  await updateUserRole(ownerId, vendorRole.id);
 
-return vendor;
+  return vendor;
 }
 
 export async function getVendorsService(query) {
