@@ -154,7 +154,7 @@ export async function findProductColorById(id) {
 
 export async function findProductWeightById(id) {
     return await prisma.ProductWeight.findUnique({
-        where: (id),
+        where: {id},
         
 
     });
