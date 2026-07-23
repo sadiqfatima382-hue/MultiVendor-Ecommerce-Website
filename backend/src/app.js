@@ -17,7 +17,7 @@ import vendorRoutes from "./routes/vendor.routes.js";
 import vendorDashboardRoutes from "./routes/vendorDashboard.routes.js";
 import vendorConfigRoutes from "./routes/vendorConfig.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
-
+import addressRoutes from "./routes/address.routes.js";
 
 const app = express();
 
@@ -42,6 +42,7 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/vendor/dashboard", vendorDashboardRoutes);
 app.use("/api/vendor/config", vendorConfigRoutes);
 app.use("/api/cart",cartRoutes)
+app.use("/api/address", addressRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({

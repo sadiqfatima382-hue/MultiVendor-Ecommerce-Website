@@ -114,7 +114,7 @@ export async function getCart(cartId) {
                                     id: true,
                                     name: true,
                                     slug: true,
-                                    thumbnail: true,
+                                    // thumbnail: true,
                                 },
                             },
 
