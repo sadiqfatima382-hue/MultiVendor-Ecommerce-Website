@@ -531,6 +531,7 @@ model Order {
   status OrderStatus @default(PENDING)
 
   vendorOrders VendorOrder[]
+  payments     Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -577,4 +578,26 @@ model OrderItem {
   total Decimal @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
+}
+
+model Payment {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  amount Decimal @db.Decimal(10, 2)
+
+  method PaymentMethod
+
+  status PaymentStatus @default(PENDING)
+
+  transactionId String?
+
+  gatewayResponse Json?
+
+  paidAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

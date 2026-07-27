@@ -101,6 +101,15 @@ export async function findOrderById(id) {
   });
 }
 
+export async function updateOrder(id, data) {
+  return prisma.order.update({
+    where: {
+      id,
+    },
+    data,
+  });
+}
+
 export async function decrementVariantStock(
   tx,
   variantId,

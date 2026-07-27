@@ -20,6 +20,8 @@ import cartRoutes from "./routes/cart.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import checkoutRoutes from "./routes/checkout.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+
 
 
 
@@ -49,6 +51,7 @@ app.use("/api/cart",cartRoutes)
 app.use("/api/address", addressRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/orders", orderRoutes)
+app.use("/api/payments", paymentRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
