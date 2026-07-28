@@ -22,6 +22,7 @@ import checkoutRoutes from "./routes/checkout.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import vendorOrderRoutes from "./routes/vendorOrder.routes.js";
+import invoiceRoutes from "./routes/invoice.routes.js";
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use("/api/checkout", checkoutRoutes);
 app.use("/api/orders", orderRoutes)
 app.use("/api/payments", paymentRoutes);
 app.use("/api/vendor/orders", vendorOrderRoutes);
+app.use("/api/invoices", invoiceRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
