@@ -1,19 +1,9 @@
 import express from "express";
-
-import {
-  createQualityControl,
-  getQualityControl,
-  updateQualityControl,
-} from "../controllers/qualityControl.controller.js";
-
+import {  createQualityControl,  getQualityControl,  updateQualityControl,} from "../controllers/qualityControl.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
-import authorize from "../middlewares/authorize.middleware.js";
-import validate from "../middlewares/validate.middleware.js";
-
-import {
-  createQualityControlSchema,
-  updateQualityControlSchema,
-} from "../validations/qualityControl.validation.js";
+import {authorize} from "../middlewares/authorize.middleware.js";
+import {validate} from "../middlewares/validate.middleware.js";
+import {  createQualityControlSchema,  updateQualityControlSchema,} from "../validators/vendor/qualityControl.validation.js";
 
 const router = express.Router();
 
