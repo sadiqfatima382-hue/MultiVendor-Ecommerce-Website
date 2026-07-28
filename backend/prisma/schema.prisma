@@ -72,6 +72,12 @@ enum InvoiceStatus {
   CANCELLED
 }
 
+enum QualityControlStatus {
+  PENDING
+  PASSED
+  FAILED
+}
+
 model Role {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -558,6 +564,7 @@ model VendorOrder {
   status OrderStatus @default(PENDING)
 
   items OrderItem[]
+  qualityControl QualityControl?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -626,6 +633,23 @@ model Invoice {
   status InvoiceStatus @default(PENDING)
 
   issuedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QualityControl {
+  id String @id @default(cuid())
+
+  vendorOrderId String @unique
+  vendorOrder VendorOrder @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
+
+  status QualityControlStatus @default(PENDING)
+
+  remarks String?
+
+  inspectedBy String?
+  inspectedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
