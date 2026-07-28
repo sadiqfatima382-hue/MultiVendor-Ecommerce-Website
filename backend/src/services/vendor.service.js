@@ -1,19 +1,10 @@
-import {  findVendorById,  findVendorByBusinessName,  findVendorBySlug,  findVendorByOwnerId,  createVendor,  findVendors,  countVendors,  updateVendor,  deleteVendor,} from "../repositories/vendor.repository.js";
+import { findVendorById, findVendorByBusinessName, findVendorBySlug, findVendorByOwnerId, createVendor, findVendors, countVendors, updateVendor, deleteVendor, } from "../repositories/vendor.repository.js";
 import { findUserById, findRoleByName, updateUserRole } from "../repositories/auth.repository.js";
 import { generateSlug } from "../utils/slug.js";
 import { getPagination } from "../utils/pagination.js";
 
 export async function createVendorService(data) {
-  const {
-    businessName,
-    description,
-    phone,
-    email,
-    address,
-    city,
-    country,
-    ownerId,
-  } = data;
+  const { businessName, description, phone, email, address, city, country, ownerId, } = data;
 
   const normalizedBusinessName = businessName.trim();
   const slug = generateSlug(normalizedBusinessName);
