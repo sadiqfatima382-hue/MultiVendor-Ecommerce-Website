@@ -563,7 +563,7 @@ model VendorOrder {
 
   status OrderStatus @default(PENDING)
 
-  items OrderItem[]
+  items          OrderItem[]
   qualityControl QualityControl?
 
   createdAt DateTime @default(now())
@@ -641,14 +641,19 @@ model Invoice {
 model QualityControl {
   id String @id @default(cuid())
 
-  vendorOrderId String @unique
-  vendorOrder VendorOrder @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
+  vendorOrderId String      @unique
+  vendorOrder   VendorOrder @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
 
   status QualityControlStatus @default(PENDING)
 
   remarks String?
 
-  inspectedBy String?
+  inspectedById String?
+
+   inspectedBy User? @relation(
+    fields: [inspectedById],
+    references: [id]
+)
   inspectedAt DateTime?
 
   createdAt DateTime @default(now())
