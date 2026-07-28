@@ -538,7 +538,7 @@ model Order {
 
   vendorOrders VendorOrder[]
   payments     Payment[]
-  invoice Invoice?
+  invoice      Invoice?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -615,13 +615,13 @@ model Invoice {
   invoiceNumber String @unique
 
   orderId String @unique
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  subtotal Decimal @db.Decimal(10,2)
-  shipping Decimal @db.Decimal(10,2)
-  discount Decimal @db.Decimal(10,2)
-  tax Decimal @db.Decimal(10,2)
-  grandTotal Decimal @db.Decimal(10,2)
+  subtotal   Decimal @db.Decimal(10, 2)
+  shipping   Decimal @db.Decimal(10, 2)
+  discount   Decimal @db.Decimal(10, 2)
+  tax        Decimal @db.Decimal(10, 2)
+  grandTotal Decimal @db.Decimal(10, 2)
 
   status InvoiceStatus @default(PENDING)
 

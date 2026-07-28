@@ -6,7 +6,7 @@ import { findPaymentByOrderId, updatePayment, } from "../repositories/payment.re
 
 const STATUS_FLOW = {
     PENDING: ["CONFIRMED", "CANCELLED"],
-
+    
     CONFIRMED: ["PROCESSING", "CANCELLED"],
 
     PROCESSING: ["SHIPPED", "CANCELLED"],
