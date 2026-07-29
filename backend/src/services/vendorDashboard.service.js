@@ -1,5 +1,5 @@
 import { findVendorProducts, findVendorProductById, countVendorProducts, countLowStockProducts, countOutOfStockProducts, submitProduct, } from "../repositories/product.repository.js";
-import { countVendorOrders, sumVendorRevenue, sumProductsSold, countCompletedVendorOrders } from "../repositories/dashboard.repository.js";
+import { countVendorOrders, sumVendorRevenue, sumProductsSold, countCompletedVendorOrders, getRecentVendorOrders, getTopSellingProducts} from "../repositories/dashboard.repository.js";
 import { findVendorByOwnerId } from "../repositories/vendor.repository.js";
 import { getPagination } from "../utils/pagination.js";
 
@@ -22,7 +22,7 @@ export async function getDashboardStatsService(ownerId) {
     today.getMonth(),
     1
   );
-  
+
   const [
     totalProducts,
     draftProducts,
@@ -45,7 +45,10 @@ export async function getDashboardStatsService(ownerId) {
     todayRevenue,
     monthlyRevenue,
     productsSold,
-    completedOrders
+    completedOrders,
+
+    recentOrders,
+    topSellingProducts,
   ] = await Promise.all([
 
     // Product Statistics
@@ -73,6 +76,9 @@ export async function getDashboardStatsService(ownerId) {
     sumVendorRevenue(vendor.id, { status: "DELIVERED", createdAt: { gte: startOfMonth, }, }),
     sumProductsSold(vendor.id),
     countCompletedVendorOrders(vendor.id),
+
+    getRecentVendorOrders(vendor.id),
+    getTopSellingProducts(vendor.id),
 
   ]);
 
@@ -111,6 +117,9 @@ export async function getDashboardStatsService(ownerId) {
       averageOrderValue,
 
     },
+
+    recentOrders,
+    topSellingProducts,
   };
 }
 export async function getVendorProductsService(ownerId, query) {
