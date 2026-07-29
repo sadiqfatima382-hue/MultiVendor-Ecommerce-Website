@@ -1,5 +1,5 @@
 import { findVendorProducts, findVendorProductById, countVendorProducts, countLowStockProducts, countOutOfStockProducts, submitProduct, } from "../repositories/product.repository.js";
-import { countVendorOrders, sumVendorRevenue, sumProductsSold, countCompletedVendorOrders, getRecentVendorOrders, getTopSellingProducts} from "../repositories/dashboard.repository.js";
+import { countVendorOrders, sumVendorRevenue, sumProductsSold, countCompletedVendorOrders, getRecentVendorOrders, getTopSellingProducts} from "../repositories/vendorDashboard.repository.js";
 import { findVendorByOwnerId } from "../repositories/vendor.repository.js";
 import { getPagination } from "../utils/pagination.js";
 
