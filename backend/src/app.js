@@ -24,7 +24,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import vendorOrderRoutes from "./routes/vendorOrder.routes.js";
 import invoiceRoutes from "./routes/invoice.routes.js";
 import qualityControlRoutes from "./routes/qualityControl.routes.js";
-
+import abandonedCartRoutes from "./routes/abandonedCart.routes.js";
 
 
 const app = express();
@@ -57,6 +57,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/vendor/orders", vendorOrderRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/quality-control", qualityControlRoutes);
+app.use("/api/abandoned-carts", abandonedCartRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
