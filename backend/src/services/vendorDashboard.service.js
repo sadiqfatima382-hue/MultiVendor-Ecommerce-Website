@@ -1,38 +1,117 @@
 import { findVendorProducts, findVendorProductById, countVendorProducts, countLowStockProducts, countOutOfStockProducts, submitProduct, } from "../repositories/product.repository.js";
-
+import { countVendorOrders, sumVendorRevenue, sumProductsSold, countCompletedVendorOrders } from "../repositories/dashboard.repository.js";
 import { findVendorByOwnerId } from "../repositories/vendor.repository.js";
 import { getPagination } from "../utils/pagination.js";
 
 export async function getDashboardStatsService(ownerId) {
-    const vendor = await findVendorByOwnerId(ownerId);
+  const vendor = await findVendorByOwnerId(ownerId);
 
-    if (!vendor) {
-        throw new Error("Vendor not found.");
-    }
+  if (!vendor) {
+    throw new Error("Vendor not found.");
+  }
+  const today = new Date();
 
-    const [totalProducts, draftProducts, pendingProducts, activeProducts, inactiveProducts, rejectedProducts, archivedProducts, lowStock, outOfStock,] = await Promise.all([
-        countVendorProducts(vendor.id),
-        countVendorProducts(vendor.id, { status: "DRAFT" }),
-        countVendorProducts(vendor.id, { status: "PENDING_APPROVAL" }),
-        countVendorProducts(vendor.id, { status: "ACTIVE" }),
-        countVendorProducts(vendor.id, { status: "INACTIVE" }),
-        countVendorProducts(vendor.id, { status: "REJECTED" }),
-        countVendorProducts(vendor.id, { status: "ARCHIVED" }),
-        countLowStockProducts(vendor.id),
-        countOutOfStockProducts(vendor.id),
-    ]);
+  const startOfToday = new Date(today);
+  startOfToday.setHours(0, 0, 0, 0);
 
-    return {
-        totalProducts,
-        draftProducts,
-        pendingProducts,
-        activeProducts,
-        inactiveProducts,
-        rejectedProducts,
-        archivedProducts,
-        lowStock,
-        outOfStock,
-    };
+  const endOfToday = new Date(today);
+  endOfToday.setHours(23, 59, 59, 999);
+
+  const startOfMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
+  
+  const [
+    totalProducts,
+    draftProducts,
+    pendingProducts,
+    activeProducts,
+    inactiveProducts,
+    rejectedProducts,
+    archivedProducts,
+    lowStock,
+    outOfStock,
+
+    totalOrders,
+    pendingOrders,
+    processingOrders,
+    shippedOrders,
+    deliveredOrders,
+    cancelledOrders,
+
+    totalRevenue,
+    todayRevenue,
+    monthlyRevenue,
+    productsSold,
+    completedOrders
+  ] = await Promise.all([
+
+    // Product Statistics
+    countVendorProducts(vendor.id),
+    countVendorProducts(vendor.id, { status: "DRAFT" }),
+    countVendorProducts(vendor.id, { status: "PENDING_APPROVAL" }),
+    countVendorProducts(vendor.id, { status: "ACTIVE" }),
+    countVendorProducts(vendor.id, { status: "INACTIVE" }),
+    countVendorProducts(vendor.id, { status: "REJECTED" }),
+    countVendorProducts(vendor.id, { status: "ARCHIVED" }),
+    countLowStockProducts(vendor.id),
+    countOutOfStockProducts(vendor.id),
+
+    // Order Statistics
+    countVendorOrders(vendor.id),
+    countVendorOrders(vendor.id, { status: "PENDING" }),
+    countVendorOrders(vendor.id, { status: "PROCESSING" }),
+    countVendorOrders(vendor.id, { status: "SHIPPED" }),
+    countVendorOrders(vendor.id, { status: "DELIVERED" }),
+    countVendorOrders(vendor.id, { status: "CANCELLED" }),
+
+    //Revenue
+    sumVendorRevenue(vendor.id, { status: "DELIVERED" }),
+    sumVendorRevenue(vendor.id, { status: "DELIVERED", createdAt: { gte: startOfToday, lte: endOfToday, }, }),
+    sumVendorRevenue(vendor.id, { status: "DELIVERED", createdAt: { gte: startOfMonth, }, }),
+    sumProductsSold(vendor.id),
+    countCompletedVendorOrders(vendor.id),
+
+  ]);
+
+  const averageOrderValue =
+    completedOrders === 0
+      ? 0
+      : totalRevenue / completedOrders;
+
+  return {
+    products: {
+      totalProducts,
+      draftProducts,
+      pendingProducts,
+      activeProducts,
+      inactiveProducts,
+      rejectedProducts,
+      archivedProducts,
+      lowStock,
+      outOfStock,
+    },
+
+    orders: {
+      totalOrders,
+      pendingOrders,
+      processingOrders,
+      shippedOrders,
+      deliveredOrders,
+      cancelledOrders,
+    },
+
+    revenue: {
+      totalRevenue,
+      todayRevenue,
+      monthlyRevenue,
+      productsSold,
+      averageOrderValue,
+
+    },
+  };
 }
 export async function getVendorProductsService(ownerId, query) {
   const vendor = await findVendorByOwnerId(ownerId);
