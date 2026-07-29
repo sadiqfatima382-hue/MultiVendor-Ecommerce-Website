@@ -36,3 +36,43 @@ export async function countOutOfStockProducts() {
     },
   });
 }
+
+export async function countOrders(where = {}) {
+  return prisma.order.count({
+    where,
+  });
+}
+
+export async function sumRevenue(where = {}) {
+  const result = await prisma.order.aggregate({
+    where,
+    _sum: {
+      grandTotal: true,
+    },
+  });
+
+  return Number(result._sum.grandTotal ?? 0);
+}
+
+export async function sumProductsSold() {
+  const result = await prisma.orderItem.aggregate({
+    where: {
+      vendorOrder: {
+        status: "DELIVERED",
+      },
+    },
+    _sum: {
+      quantity: true,
+    },
+  });
+
+  return result._sum.quantity ?? 0;
+}
+
+export async function countCompletedOrders() {
+  return prisma.order.count({
+    where: {
+      status: "DELIVERED",
+    },
+  });
+}
