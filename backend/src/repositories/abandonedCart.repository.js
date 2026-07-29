@@ -1,52 +1,64 @@
-import prisma from "../config/prisma.js";
+export async function findAbandonedCarts(
+  cutoffDate,
+  skip,
+  take
+) {
+  const [carts, total] = await Promise.all([
+    prisma.cart.findMany({
+      where: {
+        updatedAt: {
+          lt: cutoffDate,
+        },
 
-export async function findAbandonedCarts(cutoffDate) {
-  return prisma.cart.findMany({
-    where: {
-      updatedAt: {
-        lt: cutoffDate,
-      },
-
-      items: {
-        some: {},
-      },
-    },
-
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
+        items: {
+          some: {},
         },
       },
 
-      items: {
-        include: {
-          productVariant: {
-            select: {
-              id: true,
-              sku: true,
-              price: true,
-              comparePrice: true,
-              stock: true,
+      skip,
+      take,
 
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  slug: true,
-                },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+
+        items: {
+          include: {
+            productVariant: {
+              include: {
+                product: true,
               },
             },
           },
         },
       },
-    },
 
-    orderBy: {
-      updatedAt: "asc",
-    },
-  });
+      orderBy: {
+        updatedAt: "asc",
+      },
+    }),
+
+    prisma.cart.count({
+      where: {
+        updatedAt: {
+          lt: cutoffDate,
+        },
+
+        items: {
+          some: {},
+        },
+      },
+    }),
+  ]);
+
+  return {
+    carts,
+    total,
+  };
 }

@@ -1,12 +1,17 @@
-import { findAbandonedCarts } from "../repositories/abandonedCart.repository.js";
+import { getPagination } from "../helpers/pagination.js";
 
-export async function getAbandonedCartsService() {
+export async function getAbandonedCartsService(query) {
+  const { page, limit, skip } = getPagination(query);
+
   const cutoffDate = new Date();
-
-  // Cart inactive for 24 hours
   cutoffDate.setHours(cutoffDate.getHours() - 24);
 
-  const carts = await findAbandonedCarts(cutoffDate);
+  const { carts, total } =
+    await findAbandonedCarts(
+      cutoffDate,
+      skip,
+      limit
+    );
 
   const result = carts.map((cart) => {
     let totalQuantity = 0;
@@ -14,8 +19,10 @@ export async function getAbandonedCartsService() {
 
     for (const item of cart.items) {
       totalQuantity += item.quantity;
+
       subtotal +=
-        Number(item.productVariant.price) * item.quantity;
+        Number(item.productVariant.price) *
+        item.quantity;
     }
 
     return {
@@ -36,7 +43,14 @@ export async function getAbandonedCartsService() {
   });
 
   return {
-    totalAbandonedCarts: result.length,
+    totalAbandonedCarts: total,
+
+    currentPage: page,
+
+    totalPages: Math.ceil(total / limit),
+
+    limit,
+
     carts: result,
   };
 }
