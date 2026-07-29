@@ -7,8 +7,12 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.use(authorize("ADMIN"));
+router.use(authorize("SUPER_ADMIN","ADMIN"));
 
-router.get("/", getAbandonedCarts);
+router.get(
+  "/",
+  authorize("SUPER_ADMIN", "ADMIN"),
+  getAbandonedCarts
+);
 
 export default router;

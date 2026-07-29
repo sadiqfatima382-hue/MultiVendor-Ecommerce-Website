@@ -1,5 +1,5 @@
-import { getPagination } from "../helpers/pagination.js";
-
+import { getPagination } from "../utils/pagination.js";
+import { findAbandonedCarts } from "../repositories/abandonedCart.repository.js";
 export async function getAbandonedCartsService(query) {
   const { page, limit, skip } = getPagination(query);
 

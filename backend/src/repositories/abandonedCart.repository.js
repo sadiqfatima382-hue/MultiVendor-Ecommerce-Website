@@ -1,3 +1,5 @@
+import prisma from "../config/prisma.js";
+
 export async function findAbandonedCarts(
   cutoffDate,
   skip,
