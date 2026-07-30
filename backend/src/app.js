@@ -26,6 +26,7 @@ import invoiceRoutes from "./routes/invoice.routes.js";
 import qualityControlRoutes from "./routes/qualityControl.routes.js";
 import abandonedCartRoutes from "./routes/abandonedCart.routes.js";
 import adminDashboardRoutes from "./routes/adminDashboard.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use("/api/invoices", invoiceRoutes);
 app.use("/api/quality-control", qualityControlRoutes);
 app.use("/api/abandoned-carts", abandonedCartRoutes);
 app.use("/admin/dashboard", adminDashboardRoutes);
+app.use("/wishlist", wishlistRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
