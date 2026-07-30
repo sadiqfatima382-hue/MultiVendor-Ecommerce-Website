@@ -60,7 +60,7 @@ app.use("/api/invoices", invoiceRoutes);
 app.use("/api/quality-control", qualityControlRoutes);
 app.use("/api/abandoned-carts", abandonedCartRoutes);
 app.use("/admin/dashboard", adminDashboardRoutes);
-app.use("/wishlist", wishlistRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
