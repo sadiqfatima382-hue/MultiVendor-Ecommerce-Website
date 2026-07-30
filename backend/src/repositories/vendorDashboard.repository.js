@@ -104,3 +104,15 @@ return prisma.orderItem.groupBy({
   take: limit,
 });
 }
+
+export async function findVendorById(id) {
+  return prisma.vendor.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      businessName: true,
+      slug: true,
+      logo: true,
+    },
+  });
+}

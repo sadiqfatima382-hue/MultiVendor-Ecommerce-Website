@@ -5,11 +5,6 @@ import { getAdminDashboard } from "../controllers/adminDashboard.controller.js";
 
 const router = Router();
 
-router.get(
-  "/",
-  authenticate,
-  authorize("SUPER_ADMIN"),
-  getAdminDashboard
-);
+router.get("/", authenticate, authorize("SUPER_ADMIN"), getAdminDashboard);
 
 export default router;

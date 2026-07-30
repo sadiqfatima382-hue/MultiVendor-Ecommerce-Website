@@ -76,3 +76,112 @@ export async function countCompletedOrders() {
     },
   });
 }
+
+//Analytics Dashboard
+export async function getRecentOrders(limit = 5) {
+  return prisma.order.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    take: limit,
+
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
+
+export async function getRecentUsers(limit = 5) {
+  return prisma.user.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    take: limit,
+
+    include: {
+      role: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+}
+
+export async function getRecentVendors(limit = 5) {
+  return prisma.vendor.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    take: limit,
+  });
+}
+
+export async function getPendingVendorApprovals(limit = 5) {
+  return prisma.vendor.findMany({
+    where: {
+      status: "PENDING",
+    },
+
+    orderBy: {
+      createdAt: "asc",
+    },
+
+    take: limit,
+  });
+}
+
+export async function getTopSellingProducts(limit = 5) {
+  return prisma.orderItem.groupBy({
+    by: ["productId", "productName"],
+
+    where: {
+      vendorOrder: {
+        status: "DELIVERED",
+      },
+    },
+
+    _sum: {
+      quantity: true,
+    },
+
+    orderBy: {
+      _sum: {
+        quantity: "desc",
+      },
+    },
+
+    take: limit,
+  });
+}
+
+export async function getTopVendors(limit = 5) {
+  return prisma.vendorOrder.groupBy({
+    by: ["vendorId"],
+
+    where: {
+      status: "DELIVERED",
+    },
+
+    _sum: {
+      subtotal: true,
+    },
+
+    orderBy: {
+      _sum: {
+        subtotal: "desc",
+      },
+    },
+
+    take: limit,
+  });
+}
