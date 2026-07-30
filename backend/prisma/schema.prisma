@@ -140,10 +140,12 @@ model User {
   cart          Cart?
   addresses     Address[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  vendor    Vendor?
-  orders    Order[]
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
+  vendor                   Vendor?
+  orders                   Order[]
+  wishlists                Wishlist[]
+  qualityControlsInspected QualityControl[]
 
   @@index([roleId])
   @@index([email])
@@ -336,6 +338,7 @@ model Product {
 
   vendor     Vendor?     @relation(fields: [vendorId], references: [id])
   orderItems OrderItem[]
+  wishlists  Wishlist[]
 }
 
 model ProductVariant {
@@ -650,12 +653,25 @@ model QualityControl {
 
   inspectedById String?
 
-   inspectedBy User? @relation(
-    fields: [inspectedById],
-    references: [id]
-)
+  inspectedBy User?     @relation(fields: [inspectedById], references: [id])
   inspectedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Wishlist {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
 }
