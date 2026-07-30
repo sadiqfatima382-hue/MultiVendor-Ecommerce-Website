@@ -1,18 +1,24 @@
-import { countUsers, countVendors, countProducts, countLowStockProducts, countOutOfStockProducts, countOrders, sumRevenue, sumProductsSold, countCompletedOrders, getRecentOrders, getRecentUsers, getRecentVendors, getTopVendors, getTopSellingProducts, getPendingVendorApprovals } from "../repositories/adminDashboard.repository.js"
+import { countUsers, countVendors, countProducts, countLowStockProducts, countOutOfStockProducts, countOrders, sumRevenue, sumProductsSold, countCompletedOrders, getRecentOrders, getRecentUsers, getRecentVendors, getTopVendors, getTopSellingProducts, getPendingVendorApprovals, getMonthlyRevenue, getMonthlyOrders, getMonthlyUsers, getMonthlyVendors, getProductStatusDistribution, getVendorStatusDistribution, } from "../repositories/adminDashboard.repository.js";
 import { findVendorById } from "../repositories/vendorDashboard.repository.js";
+
 export async function getAdminDashboardService() {
     const today = new Date();
+
     const startOfToday = new Date(today);
-    startOfToday.setHours(0, 0, 0, 0)
+    startOfToday.setHours(0, 0, 0, 0);
 
     const endOfToday = new Date(today);
-    endOfToday.setHours(23, 59, 59, 999)
+    endOfToday.setHours(23, 59, 59, 999);
 
-    const startOfMonth = new Date(today.getFullYear(),
-        today.getMonth(), 1,
-    )
+    const startOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1
+    );
+
+    const currentYear = today.getFullYear();
+
     const [
-
         // User Statistics
         totalUsers,
         customers,
@@ -51,7 +57,7 @@ export async function getAdminDashboardService() {
         productsSold,
         completedOrders,
 
-        // Dashboard Insights
+        // Dashboard
         recentOrders,
         recentUsers,
         recentVendors,
@@ -59,16 +65,14 @@ export async function getAdminDashboardService() {
         topSellingProducts,
         topVendorStats,
 
-        //Analytics
-        monthlyRevenue,
+        // Analytics
+        monthlyRevenueChart,
         monthlyOrders,
         monthlyUsers,
         monthlyVendors,
         productStatusDistribution,
         vendorStatusDistribution,
-
     ] = await Promise.all([
-
         // Users
         countUsers(),
         countUsers({ role: { name: "CUSTOMER", }, }),
@@ -92,7 +96,7 @@ export async function getAdminDashboardService() {
         countLowStockProducts(),
         countOutOfStockProducts(),
 
-        // Order Statistics
+        // Orders
         countOrders(),
         countOrders({ status: "PENDING", }),
         countOrders({ status: "PROCESSING", }),
@@ -100,14 +104,14 @@ export async function getAdminDashboardService() {
         countOrders({ status: "DELIVERED", }),
         countOrders({ status: "CANCELLED", }),
 
-        // Revenue Statistics
+        // Revenue
         sumRevenue({ status: "DELIVERED", }),
         sumRevenue({ status: "DELIVERED", createdAt: { gte: startOfToday, lte: endOfToday, }, }),
         sumRevenue({ status: "DELIVERED", createdAt: { gte: startOfMonth, }, }),
         sumProductsSold(),
         countCompletedOrders(),
 
-        // Dashboard Insights
+        // Dashboard
         getRecentOrders(),
         getRecentUsers(),
         getRecentVendors(),
@@ -115,52 +119,49 @@ export async function getAdminDashboardService() {
         getTopSellingProducts(),
         getTopVendors(),
 
-        //Monthly Data 
+        // Analytics
         getMonthlyRevenue(currentYear),
         getMonthlyOrders(currentYear),
         getMonthlyUsers(currentYear),
         getMonthlyVendors(currentYear),
         getProductStatusDistribution(),
         getVendorStatusDistribution(),
-
     ]);
 
-    const topVendors = await Promise.all(
-        topVendorStats.map(async (vendor) => {
-            const details = await findVendorById(vendor.vendorId);
+    const topVendors = (
+        await Promise.all(
+            topVendorStats.map(async (vendor) => {
+                const details = await findVendorById(vendor.vendorId);
 
-            return {
-                id: details.id,
-                businessName: details.businessName,
-                slug: details.slug,
-                logo: details.logo,
-                revenue: Number(vendor._sum.subtotal ?? 0),
-            };
-        })
-    );
+                if (!details) return null;
+
+                return {
+                    id: details.id,
+                    businessName: details.businessName,
+                    slug: details.slug,
+                    logo: details.logo,
+                    revenue: Number(vendor._sum.subtotal ?? 0),
+                };
+            })
+        )
+    ).filter(Boolean);
 
     return {
-
         users: {
-
             totalUsers,
             customers,
             employees,
             superAdmins,
-
         },
 
         vendors: {
-
             totalVendors,
             pendingVendors,
             approvedVendors,
             rejectedVendors,
-
         },
 
         products: {
-
             totalProducts,
             draftProducts,
             pendingProducts,
@@ -170,7 +171,6 @@ export async function getAdminDashboardService() {
             archivedProducts,
             lowStock,
             outOfStock,
-
         },
 
         orders: {
@@ -200,12 +200,12 @@ export async function getAdminDashboardService() {
         },
 
         analytics: {
-            monthlyRevenue,
+            monthlyRevenueChart,
             monthlyOrders,
             monthlyUsers,
             monthlyVendors,
             productStatusDistribution,
             vendorStatusDistribution,
-        }
+        },
     };
 }

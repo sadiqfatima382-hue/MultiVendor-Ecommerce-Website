@@ -200,7 +200,10 @@ export async function getMonthlyRevenue(year) {
     ORDER BY month;
   `;
 
-  return result;
+  return result.map((row) => ({
+  month: Number(row.month),
+  revenue: Number(row.revenue),
+}));
 }
 
 //Monthly Orders
@@ -210,13 +213,15 @@ export async function getMonthlyOrders(year) {
       EXTRACT(MONTH FROM "createdAt") AS month,
       COUNT(*) AS orders
     FROM "Order"
-    WHERE
-      EXTRACT(YEAR FROM "createdAt") = ${year}
+    WHERE EXTRACT(YEAR FROM "createdAt") = ${year}
     GROUP BY month
     ORDER BY month;
   `;
 
-  return result;
+  return result.map((row) => ({
+    month: Number(row.month),
+    orders: Number(row.orders),
+  }));
 }
 
 //Monthly User Registration
@@ -226,13 +231,15 @@ export async function getMonthlyUsers(year) {
       EXTRACT(MONTH FROM "createdAt") AS month,
       COUNT(*) AS users
     FROM "User"
-    WHERE
-      EXTRACT(YEAR FROM "createdAt") = ${year}
+    WHERE EXTRACT(YEAR FROM "createdAt") = ${year}
     GROUP BY month
     ORDER BY month;
   `;
 
-  return result;
+  return result.map((row) => ({
+    month: Number(row.month),
+    users: Number(row.users),
+  }));
 }
 
 //Monthly Vendor Registration
@@ -242,13 +249,15 @@ export async function getMonthlyVendors(year) {
       EXTRACT(MONTH FROM "createdAt") AS month,
       COUNT(*) AS vendors
     FROM "Vendor"
-    WHERE
-      EXTRACT(YEAR FROM "createdAt") = ${year}
+    WHERE EXTRACT(YEAR FROM "createdAt") = ${year}
     GROUP BY month
     ORDER BY month;
   `;
 
-  return result;
+  return result.map((row) => ({
+    month: Number(row.month),
+    vendors: Number(row.vendors),
+  }));
 }
 
 //Product Status Distribution
