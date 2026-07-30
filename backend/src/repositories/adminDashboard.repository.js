@@ -185,3 +185,88 @@ export async function getTopVendors(limit = 5) {
     take: limit,
   });
 }
+
+//Monthly Revenue
+export async function getMonthlyRevenue(year) {
+  const result = await prisma.$queryRaw`
+    SELECT
+      EXTRACT(MONTH FROM "createdAt") AS month,
+      SUM("grandTotal") AS revenue
+    FROM "Order"
+    WHERE
+      "status" = 'DELIVERED'
+      AND EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY month
+    ORDER BY month;
+  `;
+
+  return result;
+}
+
+//Monthly Orders
+export async function getMonthlyOrders(year) {
+  const result = await prisma.$queryRaw`
+    SELECT
+      EXTRACT(MONTH FROM "createdAt") AS month,
+      COUNT(*) AS orders
+    FROM "Order"
+    WHERE
+      EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY month
+    ORDER BY month;
+  `;
+
+  return result;
+}
+
+//Monthly User Registration
+export async function getMonthlyUsers(year) {
+  const result = await prisma.$queryRaw`
+    SELECT
+      EXTRACT(MONTH FROM "createdAt") AS month,
+      COUNT(*) AS users
+    FROM "User"
+    WHERE
+      EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY month
+    ORDER BY month;
+  `;
+
+  return result;
+}
+
+//Monthly Vendor Registration
+export async function getMonthlyVendors(year) {
+  const result = await prisma.$queryRaw`
+    SELECT
+      EXTRACT(MONTH FROM "createdAt") AS month,
+      COUNT(*) AS vendors
+    FROM "Vendor"
+    WHERE
+      EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY month
+    ORDER BY month;
+  `;
+
+  return result;
+}
+
+//Product Status Distribution
+export async function getProductStatusDistribution() {
+  return prisma.product.groupBy({
+    by: ["status"],
+    _count: {
+      status: true,
+    },
+  });
+}
+
+//Vendor Status Distribution
+export async function getVendorStatusDistribution() {
+  return prisma.vendor.groupBy({
+    by: ["status"],
+    _count: {
+      status: true,
+    },
+  });
+}

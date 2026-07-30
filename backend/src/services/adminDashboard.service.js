@@ -59,134 +59,70 @@ export async function getAdminDashboardService() {
         topSellingProducts,
         topVendorStats,
 
+        //Analytics
+        monthlyRevenue,
+        monthlyOrders,
+        monthlyUsers,
+        monthlyVendors,
+        productStatusDistribution,
+        vendorStatusDistribution,
+
     ] = await Promise.all([
 
         // Users
         countUsers(),
-
-        countUsers({
-            role: {
-                name: "CUSTOMER",
-            },
-        }),
-
-        countUsers({
-            role: {
-                name: "EMPLOYEE",
-            },
-        }),
-
-        countUsers({
-            role: {
-                name: "SUPER_ADMIN",
-            },
-        }),
+        countUsers({ role: { name: "CUSTOMER", }, }),
+        countUsers({ role: { name: "EMPLOYEE", }, }),
+        countUsers({ role: { name: "SUPER_ADMIN", }, }),
 
         // Vendors
         countVendors(),
-
-        countVendors({
-            status: "PENDING",
-        }),
-
-        countVendors({
-            status: "APPROVED",
-        }),
-
-        countVendors({
-            status: "REJECTED",
-        }),
+        countVendors({ status: "PENDING", }),
+        countVendors({ status: "APPROVED", }),
+        countVendors({ status: "REJECTED", }),
 
         // Products
         countProducts(),
-
-        countProducts({
-            status: "DRAFT",
-        }),
-
-        countProducts({
-            status: "PENDING_APPROVAL",
-        }),
-
-        countProducts({
-            status: "ACTIVE",
-        }),
-
-        countProducts({
-            status: "INACTIVE",
-        }),
-
-        countProducts({
-            status: "REJECTED",
-        }),
-
-        countProducts({
-            status: "ARCHIVED",
-        }),
-
+        countProducts({ status: "DRAFT", }),
+        countProducts({ status: "PENDING_APPROVAL", }),
+        countProducts({ status: "ACTIVE", }),
+        countProducts({ status: "INACTIVE", }),
+        countProducts({ status: "REJECTED", }),
+        countProducts({ status: "ARCHIVED", }),
         countLowStockProducts(),
-
         countOutOfStockProducts(),
 
         // Order Statistics
         countOrders(),
-
-        countOrders({
-            status: "PENDING",
-        }),
-
-        countOrders({
-            status: "PROCESSING",
-        }),
-
-        countOrders({
-            status: "SHIPPED",
-        }),
-
-        countOrders({
-            status: "DELIVERED",
-        }),
-
-        countOrders({
-            status: "CANCELLED",
-        }),
+        countOrders({ status: "PENDING", }),
+        countOrders({ status: "PROCESSING", }),
+        countOrders({ status: "SHIPPED", }),
+        countOrders({ status: "DELIVERED", }),
+        countOrders({ status: "CANCELLED", }),
 
         // Revenue Statistics
-        sumRevenue({
-            status: "DELIVERED",
-        }),
-
-        sumRevenue({
-            status: "DELIVERED",
-            createdAt: {
-                gte: startOfToday,
-                lte: endOfToday,
-            },
-        }),
-
-        sumRevenue({
-            status: "DELIVERED",
-            createdAt: {
-                gte: startOfMonth,
-            },
-        }),
-
+        sumRevenue({ status: "DELIVERED", }),
+        sumRevenue({ status: "DELIVERED", createdAt: { gte: startOfToday, lte: endOfToday, }, }),
+        sumRevenue({ status: "DELIVERED", createdAt: { gte: startOfMonth, }, }),
         sumProductsSold(),
-
         countCompletedOrders(),
 
         // Dashboard Insights
         getRecentOrders(),
-
         getRecentUsers(),
-
         getRecentVendors(),
-
         getPendingVendorApprovals(),
-
         getTopSellingProducts(),
-
         getTopVendors(),
+
+        //Monthly Data 
+        getMonthlyRevenue(currentYear),
+        getMonthlyOrders(currentYear),
+        getMonthlyUsers(currentYear),
+        getMonthlyVendors(currentYear),
+        getProductStatusDistribution(),
+        getVendorStatusDistribution(),
+
     ]);
 
     const topVendors = await Promise.all(
@@ -261,7 +197,15 @@ export async function getAdminDashboardService() {
             pendingVendorApprovals,
             topSellingProducts,
             topVendors,
-        }
+        },
 
+        analytics: {
+            monthlyRevenue,
+            monthlyOrders,
+            monthlyUsers,
+            monthlyVendors,
+            productStatusDistribution,
+            vendorStatusDistribution,
+        }
     };
 }
