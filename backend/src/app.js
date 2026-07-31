@@ -59,7 +59,7 @@ app.use("/api/vendor/orders", vendorOrderRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/quality-control", qualityControlRoutes);
 app.use("/api/abandoned-carts", abandonedCartRoutes);
-app.use("/admin/dashboard", adminDashboardRoutes);
+app.use("/api/admin/dashboard", adminDashboardRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 // Routes
 app.get("/", (req, res) => {
