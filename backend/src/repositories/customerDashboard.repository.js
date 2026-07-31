@@ -172,7 +172,10 @@ export async function getMonthlyCustomerOrders(userId, year) {
     ORDER BY month;
   `;
 
-  return result;
+  return result.map((item) => ({
+    month: Number(item.month),
+    orders: Number(item.orders),
+  }));
 }
 
 export async function getPurchasedProducts(userId) {
