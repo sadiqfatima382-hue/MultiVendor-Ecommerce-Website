@@ -2,6 +2,7 @@ import { countCartItems, sumCustomerSpending, sumCustomerProductsPurchased, coun
 import { countWishlistItems } from "../repositories/wishlist.repository.js"
 import { getRecommendedProducts } from "../repositories/product.repository.js";
 export async function getCustomerDashboardService(userId) {
+    const currentYear = new Date().getFullYear();
     const [
 
         totalOrders,
@@ -25,6 +26,10 @@ export async function getCustomerDashboardService(userId) {
         cartPreview,
         recommendedProducts,
 
+        monthlySpending,
+monthlyOrders,
+favoriteCategories,
+favoriteBrands,
     ] = await Promise.all([
         countCustomerOrders(userId),
         countCustomerOrders(userId, { status: "PENDING", }),
@@ -53,6 +58,14 @@ export async function getCustomerDashboardService(userId) {
         getCartPreview(userId),
 
         getRecommendedProducts(),
+
+        getMonthlyCustomerSpending(userId, currentYear),
+
+getMonthlyCustomerOrders(userId, currentYear),
+
+getFavoriteCategories(userId),
+
+getFavoriteBrands(userId),
     ]);
 
     return {
@@ -87,8 +100,62 @@ export async function getCustomerDashboardService(userId) {
 
         recommendations: {
             products: recommendedProducts,
-        }
+        },
+
+        analytics: {
+    monthlySpending,
+    monthlyOrders,
+    favoriteCategories,
+    favoriteBrands,
+},
     };
 
+    const purchasedProducts =
+    await getPurchasedProducts(userId);
+
+
+    const categoryMap = {};
+
+for (const item of purchasedProducts) {
+  const category = item.product.category;
+
+  if (!category) continue;
+
+  if (!categoryMap[category.id]) {
+    categoryMap[category.id] = {
+      id: category.id,
+      name: category.name,
+      total: 0,
+    };
+  }
+
+  categoryMap[category.id].total += item.quantity;
+}
+
+const favoriteCategories = Object.values(categoryMap)
+  .sort((a, b) => b.total - a.total)
+  .slice(0, 5);
+
+  const brandMap = {};
+
+for (const item of purchasedProducts) {
+  const brand = item.product.brand;
+
+  if (!brand) continue;
+
+  if (!brandMap[brand.id]) {
+    brandMap[brand.id] = {
+      id: brand.id,
+      name: brand.name,
+      total: 0,
+    };
+  }
+
+  brandMap[brand.id].total += item.quantity;
+}
+
+const favoriteBrands = Object.values(brandMap)
+  .sort((a, b) => b.total - a.total)
+  .slice(0, 5);
 
 }

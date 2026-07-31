@@ -141,3 +141,58 @@ export async function getCartPreview(userId, limit = 5) {
     },
   });
 }
+
+export async function getMonthlyCustomerSpending(userId, year) {
+  const result = await prisma.$queryRaw`
+    SELECT
+      EXTRACT(MONTH FROM "createdAt") AS month,
+      SUM("grandTotal") AS total
+    FROM "Order"
+    WHERE
+      "userId" = ${userId}
+      AND "status" = 'DELIVERED'
+      AND EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY month
+    ORDER BY month;
+  `;
+
+  return result;
+}
+
+export async function getMonthlyCustomerOrders(userId, year) {
+  const result = await prisma.$queryRaw`
+    SELECT
+      EXTRACT(MONTH FROM "createdAt") AS month,
+      COUNT(*) AS orders
+    FROM "Order"
+    WHERE
+      "userId" = ${userId}
+      AND EXTRACT(YEAR FROM "createdAt") = ${year}
+    GROUP BY month
+    ORDER BY month;
+  `;
+
+  return result;
+}
+
+export async function getPurchasedProducts(userId) {
+  return prisma.orderItem.findMany({
+    where: {
+      vendorOrder: {
+        order: {
+          userId,
+        },
+        status: "DELIVERED",
+      },
+    },
+
+    include: {
+      product: {
+        include: {
+          category: true,
+          brand: true,
+        },
+      },
+    },
+  });
+}
