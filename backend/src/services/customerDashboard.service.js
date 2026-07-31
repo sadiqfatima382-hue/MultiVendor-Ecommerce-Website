@@ -1,5 +1,5 @@
-import { countCartItems, countWishlistItems, sumCustomerSpending, sumCustomerProductsPurchased, countCustomerOrders,countAddresses } from "../repositories/customerDashboard.repository";
-import {countwishlistItems} from "../repositories/wishlist.repository"
+import { countCartItems, sumCustomerSpending, sumCustomerProductsPurchased, countCustomerOrders,countAddresses } from "../repositories/customerDashboard.repository.js";
+import {countWishlistItems} from "../repositories/wishlist.repository.js"
 export async function getCustomerDashboardService(userId) {
     const [
 
