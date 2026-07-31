@@ -1,5 +1,6 @@
-import { countCartItems, sumCustomerSpending, sumCustomerProductsPurchased, countCustomerOrders,countAddresses } from "../repositories/customerDashboard.repository.js";
-import {countWishlistItems} from "../repositories/wishlist.repository.js"
+import { countCartItems, sumCustomerSpending, sumCustomerProductsPurchased, countCustomerOrders, countAddresses, getRecentCustomerOrders, getRecentWishlist, getCartPreview } from "../repositories/customerDashboard.repository.js";
+import { countWishlistItems } from "../repositories/wishlist.repository.js"
+import { getRecommendedProducts } from "../repositories/product.repository.js";
 export async function getCustomerDashboardService(userId) {
     const [
 
@@ -14,14 +15,15 @@ export async function getCustomerDashboardService(userId) {
         refundedOrders,
 
         wishlistItems,
-
         cartItems,
-
         addresses,
-
         totalSpent,
-
         productsPurchased,
+
+        recentOrders,
+        recentWishlist,
+        cartPreview,
+        recommendedProducts,
 
     ] = await Promise.all([
         countCustomerOrders(userId),
@@ -43,31 +45,50 @@ export async function getCustomerDashboardService(userId) {
         sumCustomerSpending(userId),
 
         sumCustomerProductsPurchased(userId),
+
+        getRecentCustomerOrders(userId),
+
+        getRecentWishlist(userId),
+
+        getCartPreview(userId),
+
+        getRecommendedProducts(),
     ]);
 
-return {
+    return {
 
-    orders: {
+        orders: {
 
-        totalOrders,
-        pendingOrders,
-        confirmedOrders,
-        processingOrders,
-        shippedOrders,
-        deliveredOrders,
-        cancelledOrders,
-        returnedOrders,
-        refundedOrders,
+            totalOrders,
+            pendingOrders,
+            confirmedOrders,
+            processingOrders,
+            shippedOrders,
+            deliveredOrders,
+            cancelledOrders,
+            returnedOrders,
+            refundedOrders,
 
-    },
+        },
 
-    wishlistItems: { totalItems: wishlistItems, },
+        wishlistItems: { totalItems: wishlistItems, },
 
-    cart: { totalItems: cartItems, },
+        cart: { totalItems: cartItems, },
 
-    addresses: { totalAddresses: addresses, },
+        addresses: { totalAddresses: addresses, },
 
-    spending: { totalSpent, productsPurchased, },
+        spending: { totalSpent, productsPurchased, },
 
-};
+        activity: {
+            recentOrders,
+            recentWishlist,
+            cartPreview,
+        },
+
+        recommendations: {
+            products: recommendedProducts,
+        }
+    };
+
+
 }

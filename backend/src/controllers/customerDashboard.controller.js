@@ -9,6 +9,9 @@ export async function getCustomerDashboard(req, res, next) {
       data,
     });
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 }

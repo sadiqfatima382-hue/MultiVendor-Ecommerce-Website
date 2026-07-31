@@ -3,7 +3,7 @@ import prisma from "../config/prisma.js";
 export async function findProductByName(name) {
   return prisma.product.findFirst({
     where: {
-       name: {
+      name: {
         equals: name,
         mode: "insensitive",
       },
@@ -46,56 +46,56 @@ export async function findProducts({
     where,
     orderBy,
 
-    
-     select: {
-    id: true,
-    name: true,
-    slug: true,
-    shortDescription: true,
-    description: true,
-    status: true,
 
-    category: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      shortDescription: true,
+      description: true,
+      status: true,
+
+      category: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    brand: {
+      brand: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    type: {
+      type: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    base: {
+      base: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    badge: {
+      badge: {
         select: {
-            id: true,
-            name: true,
-            color: true,
+          id: true,
+          name: true,
+          color: true,
         },
-    },
+      },
 
-    createdAt: true,
-    updatedAt: true,
-}
+      createdAt: true,
+      updatedAt: true,
+    }
 
-    
+
   });
 }
 
@@ -110,52 +110,52 @@ export async function updateProduct(id, data) {
     where: { id },
     data,
     select: {
-    id: true,
-    name: true,
-    slug: true,
-    shortDescription: true,
-    description: true,
-    status: true,
+      id: true,
+      name: true,
+      slug: true,
+      shortDescription: true,
+      description: true,
+      status: true,
 
-    category: {
+      category: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    brand: {
+      brand: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    type: {
+      type: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    base: {
+      base: {
         select: {
-            id: true,
-            name: true,
+          id: true,
+          name: true,
         },
-    },
+      },
 
-    badge: {
+      badge: {
         select: {
-            id: true,
-            name: true,
-            color: true,
+          id: true,
+          name: true,
+          color: true,
         },
-    },
+      },
 
-    createdAt: true,
-    updatedAt: true,
-}
+      createdAt: true,
+      updatedAt: true,
+    }
   });
 }
 
@@ -165,7 +165,7 @@ export async function deleteProduct(id) {
   });
 }
 export async function findCategoryById(id) {
-    return prisma.productCategory.findUnique({
+  return prisma.productCategory.findUnique({
     where: {
       id,
     },
@@ -173,27 +173,27 @@ export async function findCategoryById(id) {
 }
 
 export async function findBrandById(id) {
-    return prisma.productBrand.findUnique({
-        where: { id },
-    });
+  return prisma.productBrand.findUnique({
+    where: { id },
+  });
 }
 
 export async function findProductTypeById(id) {
-     return prisma.productType.findUnique({
-        where: { id },
-    });
+  return prisma.productType.findUnique({
+    where: { id },
+  });
 }
 
 export async function findProductBaseById(id) {
-     return prisma.productBase.findUnique({
-        where: { id },
-    });
+  return prisma.productBase.findUnique({
+    where: { id },
+  });
 }
 
 export async function findProductBadgeById(id) {
-     return prisma.productBadge.findUnique({
-        where: { id },
-    });
+  return prisma.productBadge.findUnique({
+    where: { id },
+  });
 }
 
 //Vendor Product repository 
@@ -297,6 +297,32 @@ export async function submitProduct(productId) {
     },
     data: {
       status: "PENDING_APPROVAL",
+    },
+  });
+}
+
+export async function getRecommendedProducts(limit = 8) {
+  return prisma.product.findMany({
+    where: {
+      status: "ACTIVE",
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    take: limit,
+
+    include: {
+      brand: true,
+      category: true,
+      variants: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        take: 1,
+      },
+
     },
   });
 }

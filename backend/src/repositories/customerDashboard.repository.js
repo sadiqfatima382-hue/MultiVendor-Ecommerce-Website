@@ -71,3 +71,73 @@ export async function countAddresses(userId) {
   });
 }
 
+export async function getRecentCustomerOrders(userId, limit = 5) {
+  return prisma.order.findMany({
+    where: {
+      userId,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    take: limit,
+
+    select: {
+      id: true,
+
+      status: true,
+      grandTotal: true,
+      paymentStatus: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function getRecentWishlist(userId, limit = 5) {
+  return prisma.wishlist.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: limit,
+    include: {
+      product: {
+        include: {
+          brand: true,
+          category: true,
+          variants: {
+            take: 1,
+          },
+        },
+      },
+    },
+  });
+}
+
+export async function getCartPreview(userId, limit = 5) {
+  return prisma.cartItem.findMany({
+    where: {
+      cart: {
+        userId,
+      },
+    },
+
+    take: limit,
+
+    include: {
+      productVariant: {
+        include: {
+          product: {
+            include: {
+              brand: true,
+              category: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
