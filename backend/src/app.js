@@ -28,6 +28,8 @@ import abandonedCartRoutes from "./routes/abandonedCart.routes.js";
 import adminDashboardRoutes from "./routes/adminDashboard.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import customerDashboardRoutes from "./routes/customerDashboard.routes.js";
+import supplierRoutes from "./supplier.routes.js";
+
 
 const app = express();
 
@@ -63,6 +65,7 @@ app.use("/api/abandoned-carts", abandonedCartRoutes);
 app.use("/api/admin/dashboard", adminDashboardRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/customer-dashboard", customerDashboardRoutes);
+app.use("/suppliers", supplierRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
