@@ -156,3 +156,115 @@ await calculatePurchaseTotals(
 );
 
 return item;}
+
+export async function updatePurchaseItemService(
+  user,
+  itemId,
+  body
+) {
+
+  const item = await findPurchaseItemById(itemId);
+
+  if (!item) {
+    throw new Error("Purchase item not found.");
+  }
+
+  const purchase = await findPurchaseById(item.purchaseId);
+
+  if (!purchase) {
+    throw new Error("Purchase not found.");
+  }
+
+  if (purchase.status !== "DRAFT") {
+    throw new Error(
+      "Only draft purchases can be modified."
+    );
+  }
+
+  if (user.role.name === "VENDOR") {
+
+    const vendor =
+      await findVendorByOwnerId(user.id);
+
+    if (purchase.vendorId !== vendor.id) {
+      throw new Error("Access denied.");
+    }
+
+  }
+
+  const updatedData = {};
+
+  if (body.quantity !== undefined) {
+    updatedData.quantity = body.quantity;
+  }
+
+  if (body.unitCost !== undefined) {
+    updatedData.unitCost = body.unitCost;
+  }
+
+  const quantity =
+    body.quantity ?? item.quantity;
+
+  const unitCost =
+    Number(body.unitCost ?? item.unitCost);
+
+  updatedData.total =
+    quantity * unitCost;
+
+  const updatedItem =
+    await updatePurchaseItem(
+      item.id,
+      updatedData
+    );
+
+  await calculatePurchaseTotals(
+    purchase.id
+  );
+
+  return updatedItem;
+}
+
+export async function removePurchaseItemService(
+  user,
+  itemId
+) {
+
+  const item =
+    await findPurchaseItemById(itemId);
+
+  if (!item) {
+    throw new Error("Purchase item not found.");
+  }
+
+  const purchase =
+    await findPurchaseById(item.purchaseId);
+
+  if (!purchase) {
+    throw new Error("Purchase not found.");
+  }
+
+  if (purchase.status !== "DRAFT") {
+    throw new Error(
+      "Only draft purchases can be modified."
+    );
+  }
+
+  if (user.role.name === "VENDOR") {
+
+    const vendor =
+      await findVendorByOwnerId(user.id);
+
+    if (purchase.vendorId !== vendor.id) {
+      throw new Error("Access denied.");
+    }
+
+  }
+
+  await removePurchaseItem(item.id);
+
+  await calculatePurchaseTotals(
+    purchase.id
+  );
+
+  return;
+}
