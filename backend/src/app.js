@@ -65,7 +65,7 @@ app.use("/api/abandoned-carts", abandonedCartRoutes);
 app.use("/api/admin/dashboard", adminDashboardRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/customer-dashboard", customerDashboardRoutes);
-app.use("/suppliers", supplierRoutes);
+app.use("/api/suppliers", supplierRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
