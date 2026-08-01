@@ -1,10 +1,11 @@
+import express from "express"
 import { createSupplier, getSuppliers, getSupplierById, updateSupplier, deleteSupplier, } from "../controllers/supplier.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/authorize.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { createSupplierSchema, updateSupplierSchema, supplierIdSchema, } from "../validators/purchase/supplier.validation.js";
 
-const router = Router();
+const router = express.Router();
 
 router.use(authenticate, authorize("SUPER_ADMIN", "VENDOR"));
 

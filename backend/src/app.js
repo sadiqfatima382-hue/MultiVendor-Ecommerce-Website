@@ -28,7 +28,7 @@ import abandonedCartRoutes from "./routes/abandonedCart.routes.js";
 import adminDashboardRoutes from "./routes/adminDashboard.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import customerDashboardRoutes from "./routes/customerDashboard.routes.js";
-import supplierRoutes from "./supplier.routes.js";
+import supplierRoutes from "./routes/supplier.routes.js";
 
 
 const app = express();

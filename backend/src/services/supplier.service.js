@@ -1,6 +1,6 @@
-import { createSupplier, findSupplierById, findSupplierByEmail,findSupplierByPhone,updateSupplier,deleteSupplier, countSuppliers, findSuppliers } from "../repositories/supplier.repository";
-import { findVendorByOwnerId } from "../repositories/vendor.repository";
-import { getPagination } from "../utils/pagination";
+import { createSupplier, findSupplierById, findSupplierByEmail,findSupplierByPhone,updateSupplier,deleteSupplier, countSuppliers, findSuppliers } from "../repositories/supplier.repository.js";
+import { findVendorByOwnerId } from "../repositories/vendor.repository.js";
+import { getPagination } from "../utils/pagination.js";
 
 export async function createSupplierService(user, body) {
 
