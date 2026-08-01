@@ -1,16 +1,6 @@
 import prisma from "../config/prisma.js";
-
-import {
-  createQualityControl,
-  findQualityControlByVendorOrder,
-  updateQualityControl,
-} from "../repositories/qualityControl.repository.js";
-
-import {
-  findVendorOrderById,
-  updateVendorOrder,
-} from "../repositories/vendorOrder.repository.js";
-
+import { createQualityControl, findQualityControlByVendorOrder, updateQualityControl, } from "../repositories/qualityControl.repository.js";
+import { findVendorOrderById, updateVendorOrder, } from "../repositories/vendorOrder.repository.js";
 import { findVendorByOwnerId } from "../repositories/vendor.repository.js";
 
 export async function createQualityControlService(
