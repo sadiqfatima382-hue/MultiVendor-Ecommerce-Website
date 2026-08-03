@@ -47,20 +47,27 @@ async function calculatePurchaseTotals(
 
 }
 
-export async function createPurchaseService(user, body) {
 
+async function verifyPurchaseOwnership(user, purchase) {
+  if (user.role.name !== "VENDOR") return;
+
+  const vendor = await findVendorByOwnerId(user.id);
+
+  if (!vendor || purchase.vendorId !== vendor.id) {
+    throw new Error("Access denied.");
+  }
+}
+
+export async function createPurchaseService(user, body) {
   const supplier = await findSupplierById(body.supplierId);
 
   if (!supplier) {
     throw new Error("Supplier not found.");
   }
 
-  const purchaseNumber = await generateBusinessNumber(
-    "PUR",
-    {
-      includeYear: true,
-    }
-  );
+  const purchaseNumber = await generateBusinessNumber("PUR", {
+    includeYear: true,
+  });
 
   const data = {
     purchaseNumber,
@@ -96,73 +103,59 @@ export async function addPurchaseItemService(
   purchaseId,
   body
 ) {
-    const purchase = await findPurchaseById(purchaseId);
+  const purchase = await findPurchaseById(purchaseId);
 
-if (!purchase) {
-  throw new Error("Purchase not found.");
-}
-if (purchase.status !== "DRAFT") {
-  throw new Error(
-    "Only draft purchases can be modified."
-  );
-}
-if (user.role.name === "VENDOR") {
-
-  const vendor =
-    await findVendorByOwnerId(user.id);
-
-  if (purchase.vendorId !== vendor.id) {
-    throw new Error("Access denied.");
+  if (!purchase) {
+    throw new Error("Purchase not found.");
   }
 
-}
-const product =
-  await findProductById(body.productId);
+  ensureDraftPurchase(purchase);
 
-if (!product) {
-  throw new Error("Product not found.");
-}
-const variant =
-  await findProductVariantById(
+  await verifyPurchaseOwnership(user, purchase);
+
+  const product = await findProductById(body.productId);
+
+  if (!product) {
+    throw new Error("Product not found.");
+  }
+
+  const variant = await findProductVariantById(
     body.productVariantId
   );
 
-if (!variant) {
-  throw new Error(
-    "Product variant not found."
-  );
-}
-const total =
-  Number(body.unitCost) *
-  Number(body.quantity);
+  if (!variant) {
+    throw new Error("Product variant not found.");
+  }
+
+  // New validation
+  if (variant.productId !== product.id) {
+    throw new Error(
+      "Selected variant does not belong to the selected product."
+    );
+  }
+
+  const total =
+    Number(body.unitCost) *
+    Number(body.quantity);
+
   const item = await addPurchaseItem({
+    purchaseId,
+    productId: body.productId,
+    productVariantId: body.productVariantId,
+    quantity: body.quantity,
+    unitCost: body.unitCost,
+    total,
+  });
 
-  purchaseId,
+  await calculatePurchaseTotals(purchaseId);
 
-  productId: body.productId,
-
-  productVariantId:
-    body.productVariantId,
-
-  quantity: body.quantity,
-
-  unitCost: body.unitCost,
-
-  total,
-
-});
-await calculatePurchaseTotals(
-  purchaseId
-);
-
-return item;}
-
+  return item;
+}
 export async function updatePurchaseItemService(
   user,
   itemId,
   body
 ) {
-
   const item = await findPurchaseItemById(itemId);
 
   if (!item) {
@@ -175,22 +168,9 @@ export async function updatePurchaseItemService(
     throw new Error("Purchase not found.");
   }
 
-  if (purchase.status !== "DRAFT") {
-    throw new Error(
-      "Only draft purchases can be modified."
-    );
-  }
+  ensureDraftPurchase(purchase);
 
-  if (user.role.name === "VENDOR") {
-
-    const vendor =
-      await findVendorByOwnerId(user.id);
-
-    if (purchase.vendorId !== vendor.id) {
-      throw new Error("Access denied.");
-    }
-
-  }
+  await verifyPurchaseOwnership(user, purchase);
 
   const updatedData = {};
 
@@ -212,14 +192,9 @@ export async function updatePurchaseItemService(
     quantity * unitCost;
 
   const updatedItem =
-    await updatePurchaseItem(
-      item.id,
-      updatedData
-    );
+    await updatePurchaseItem(item.id, updatedData);
 
-  await calculatePurchaseTotals(
-    purchase.id
-  );
+  await calculatePurchaseTotals(purchase.id);
 
   return updatedItem;
 }
@@ -228,43 +203,23 @@ export async function removePurchaseItemService(
   user,
   itemId
 ) {
-
-  const item =
-    await findPurchaseItemById(itemId);
+  const item = await findPurchaseItemById(itemId);
 
   if (!item) {
     throw new Error("Purchase item not found.");
   }
 
-  const purchase =
-    await findPurchaseById(item.purchaseId);
+  const purchase = await findPurchaseById(item.purchaseId);
 
   if (!purchase) {
     throw new Error("Purchase not found.");
   }
 
-  if (purchase.status !== "DRAFT") {
-    throw new Error(
-      "Only draft purchases can be modified."
-    );
-  }
+  ensureDraftPurchase(purchase);
 
-  if (user.role.name === "VENDOR") {
-
-    const vendor =
-      await findVendorByOwnerId(user.id);
-
-    if (purchase.vendorId !== vendor.id) {
-      throw new Error("Access denied.");
-    }
-
-  }
+  await verifyPurchaseOwnership(user, purchase);
 
   await removePurchaseItem(item.id);
 
-  await calculatePurchaseTotals(
-    purchase.id
-  );
-
-  return;
+  await calculatePurchaseTotals(purchase.id);
 }
