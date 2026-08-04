@@ -1,4 +1,4 @@
-import { updatePurchaseStatus } from "../repositories/purchase.repository.js";
+import { updatePurchaseStatus,findPurchaseById } from "../repositories/purchase.repository.js";
 
 function ensurePurchaseStatus(purchase, status) {
   if (purchase.status !== status) {
