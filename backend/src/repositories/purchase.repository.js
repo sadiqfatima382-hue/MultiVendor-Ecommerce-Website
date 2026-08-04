@@ -114,3 +114,31 @@ export async function getPurchaseItems(
     },
   });
 }
+
+export async function approvePurchase(
+  purchaseId,
+  approvedById
+) {
+  return prisma.purchase.update({
+    where: {
+      id: purchaseId,
+    },
+    data: {
+      status: "APPROVED",
+      approvedById,
+      approvedAt: new Date(),
+    },
+  });
+}
+
+export async function updatePurchaseStatus(
+  purchaseId,
+  data
+) {
+  return prisma.purchase.update({
+    where: {
+      id: purchaseId,
+    },
+    data,
+  });
+}
