@@ -1,4 +1,4 @@
-import { createPurchaseService, updatePurchaseItemService, updatePurchaseService, deletePurchaseService, submitPurchaseService, addPurchaseItemService, removePurchaseItemService } from "../services/purchase.service"
+import { createPurchaseService, updatePurchaseItemService, updatePurchaseService, deletePurchaseService, submitPurchaseService, addPurchaseItemService, removePurchaseItemService } from "../services/purchase.service.js"
 
 export async function createPurchase(req, res) {
   try {
