@@ -5,6 +5,7 @@ import { findProductById } from "../repositories/product.repository.js";
 import { findProductVariantById } from "../repositories/productVariant.repository.js";
 import { generateBusinessNumber } from "../utils/businessNumber.js";
 
+// await prisma.$transaction(async (tx) => {
 async function calculatePurchaseTotals(
   purchaseId
 ) {
@@ -47,7 +48,6 @@ async function calculatePurchaseTotals(
 
 }
 
-
 async function verifyPurchaseOwnership(user, purchase) {
   if (user.role.name !== "VENDOR") return;
 
@@ -55,6 +55,18 @@ async function verifyPurchaseOwnership(user, purchase) {
 
   if (!vendor || purchase.vendorId !== vendor.id) {
     throw new Error("Access denied.");
+  }
+}
+
+function ensureDraftPurchase(purchase) {
+  if (!purchase) {
+    throw new Error("Purchase not found.");
+  }
+
+  if (purchase.status !== "DRAFT") {
+    throw new Error(
+      "Only draft purchases can be modified."
+    );
   }
 }
 
@@ -151,6 +163,7 @@ export async function addPurchaseItemService(
 
   return item;
 }
+
 export async function updatePurchaseItemService(
   user,
   itemId,
@@ -222,4 +235,85 @@ export async function removePurchaseItemService(
   await removePurchaseItem(item.id);
 
   await calculatePurchaseTotals(purchase.id);
+}
+
+export async function updatePurchaseService(
+  user,
+  purchaseId,
+  body
+) {
+  const purchase = await findPurchaseById(purchaseId);
+
+  if (!purchase) {
+    throw new Error("Purchase not found.");
+  }
+
+  ensureDraftPurchase(purchase);
+
+  await verifyPurchaseOwnership(user, purchase);
+
+  if (body.supplierId) {
+    const supplier = await findSupplierById(body.supplierId);
+
+    if (!supplier) {
+      throw new Error("Supplier not found.");
+    }
+  }
+
+  const updatedPurchase = await updatePurchase(
+    purchaseId,
+    body
+  );
+
+  await calculatePurchaseTotals(purchaseId);
+
+  return updatedPurchase;
+}
+
+export async function deletePurchaseService(
+  user,
+  purchaseId
+) {
+  const purchase = await findPurchaseById(purchaseId);
+
+  if (!purchase) {
+    throw new Error("Purchase not found.");
+  }
+
+  ensureDraftPurchase(purchase);
+
+  await verifyPurchaseOwnership(user, purchase);
+
+  await deletePurchase(purchaseId);
+
+  return {
+    message: "Purchase deleted successfully.",
+  };
+}
+
+export async function submitPurchaseService(
+  user,
+  purchaseId
+) {
+  const purchase = await findPurchaseById(purchaseId);
+
+  if (!purchase) {
+    throw new Error("Purchase not found.");
+  }
+
+  ensureDraftPurchase(purchase);
+
+  await verifyPurchaseOwnership(user, purchase);
+
+  const items = await getPurchaseItems(purchaseId);
+
+  if (items.length === 0) {
+    throw new Error(
+      "Purchase must contain at least one item."
+    );
+  }
+
+  return updatePurchase(purchaseId, {
+    status: "SUBMITTED",
+  });
 }
