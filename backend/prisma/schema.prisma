@@ -167,7 +167,7 @@ model User {
 
   createdSuppliers Supplier[] @relation("CreatedSuppliers")
   createdPurchases Purchase[] @relation("CreatedPurchases")
-
+  approvedPurchases Purchase[] @relation("PurchaseApprovedBy")
   @@index([roleId])
   @@index([email])
 }
@@ -736,6 +736,11 @@ model Purchase {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  approvedById String?
+  approvedBy   User? @relation("PurchaseApprovedBy", fields: [approvedById], references: [id])
+
+  approvedAt DateTime?
 
   @@index([supplierId])
   @@index([vendorId])
