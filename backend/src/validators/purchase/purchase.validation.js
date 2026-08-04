@@ -81,3 +81,8 @@ export const updatePurchaseItemSchema = z.object({
 export const submitPurchaseSchema = z.object({
   body: z.object({}),
 });
+
+
+export const approvePurchaseSchema = z.object({
+  body: z.object({}),
+});
