@@ -1,4 +1,4 @@
-import {  approvePurchaseService,} from "../services/purchase.service.js";
+import {  approvePurchaseService,} from "../services/approval.service.js";
 export async function approvePurchase(req, res) {
   try {
     const purchase = await approvePurchaseService(

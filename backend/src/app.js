@@ -30,6 +30,7 @@ import wishlistRoutes from "./routes/wishlist.routes.js";
 import customerDashboardRoutes from "./routes/customerDashboard.routes.js";
 import supplierRoutes from "./routes/supplier.routes.js";
 import purchaseRoutes from "./routes/purchase.routes.js";
+import approveRoutes from "./routes/approval.routes.js"
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/customer-dashboard", customerDashboardRoutes);
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/purchases", purchaseRoutes);
+app.use("/api/approve", approveRoutes)
 // Routes
 app.get("/", (req, res) => {
     res.json({
