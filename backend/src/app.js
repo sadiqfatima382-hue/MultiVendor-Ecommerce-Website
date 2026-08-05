@@ -4,9 +4,9 @@ import helmet from "helmet";
 import morgan from "morgan";
 import authRoutes from "./routes/auth.routes.js";
 import brandRoutes from "./routes/brand.routes.js";
-import productTypeRoutes from"./routes/productType.routes.js";
-import productBaseRoutes from"./routes/productBase.routes.js";
-import productBadgeRoutes from"./routes/productBadge.routes.js";
+import productTypeRoutes from "./routes/productType.routes.js";
+import productBaseRoutes from "./routes/productBase.routes.js";
+import productBadgeRoutes from "./routes/productBadge.routes.js";
 import productColorRoutes from "./routes/productColor.routes.js";
 import productSizeRoutes from "./routes/productSize.routes.js";
 import productWeightRoutes from "./routes/productWeight.routes.js";
@@ -31,7 +31,7 @@ import customerDashboardRoutes from "./routes/customerDashboard.routes.js";
 import supplierRoutes from "./routes/supplier.routes.js";
 import purchaseRoutes from "./routes/purchase.routes.js";
 import approveRoutes from "./routes/approval.routes.js"
-
+import goodsReceiptRoutes from "./routes/goodsReceipt.routes.js"
 const app = express();
 
 // Middleware
@@ -54,7 +54,7 @@ app.use("/api/product-images", productImageRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/vendor/dashboard", vendorDashboardRoutes);
 app.use("/api/vendor/config", vendorConfigRoutes);
-app.use("/api/cart",cartRoutes)
+app.use("/api/cart", cartRoutes)
 app.use("/api/address", addressRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/orders", orderRoutes)
@@ -69,6 +69,7 @@ app.use("/api/customer-dashboard", customerDashboardRoutes);
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/purchases", purchaseRoutes);
 app.use("/api/approve", approveRoutes)
+app.use("/api/goods-receipts", goodsReceiptRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
