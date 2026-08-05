@@ -104,6 +104,16 @@ enum InventoryType {
   ADJUSTMENT
 }
 
+enum InventoryLedgerType {
+  PURCHASE_RECEIVED
+
+  SALE
+
+  RETURN
+
+  ADJUSTMENT
+}
+
 model Role {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -174,6 +184,7 @@ model User {
   qualityControlsInspected QualityControl[]
   goodsReceipts GoodsReceipt[]
   inventoryLedgers InventoryLedger[]
+  inventoryAdjustments InventoryAdjustment[]
 
   createdSuppliers Supplier[] @relation("CreatedSuppliers")
   createdPurchases Purchase[] @relation("CreatedPurchases")
@@ -399,6 +410,7 @@ model ProductVariant {
   color ProductColor? @relation(fields: [colorId], references: [id])
 
   weight ProductWeight? @relation(fields: [weightId], references: [id])
+  adjustmentItems InventoryAdjustmentItem[]
 
   cartItems CartItem[]
   inventoryLedgers InventoryLedger[]
@@ -894,6 +906,42 @@ model InventoryLedger {
 
   createdById String
   createdBy User @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model InventoryAdjustment {
+  id String @id @default(cuid())
+
+  adjustmentNumber String @unique
+
+  reason String
+
+  notes String?
+
+  createdById String
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  items InventoryAdjustmentItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InventoryAdjustmentItem {
+  id String @id @default(cuid())
+
+  adjustmentId String
+  adjustment InventoryAdjustment @relation(fields: [adjustmentId], references: [id], onDelete: Cascade)
+
+  productVariantId String
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
+
+  previousStock Int
+
+  adjustedStock Int
+
+  difference Int
 
   createdAt DateTime @default(now())
 }

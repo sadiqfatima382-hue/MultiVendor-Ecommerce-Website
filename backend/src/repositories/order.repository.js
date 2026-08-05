@@ -131,3 +131,29 @@ export async function decrementVariantStock(
 
   return result;
 }
+
+export async function findUserCart(
+  userId,
+  db = prisma
+) {
+  return db.cart.findUnique({
+    where: {
+      userId,
+    },
+    include: {
+      items: {
+        include: {
+          productVariant: {
+            include: {
+              product: {
+                include: {
+                  vendor: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
