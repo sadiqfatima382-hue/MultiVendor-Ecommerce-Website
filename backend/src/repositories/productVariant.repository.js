@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 
-export async function findProductVariantById(id) {
-    return prisma.productVariant.findUnique({
+export async function findProductVariantById(id, db=prisma) {
+    return db.productVariant.findUnique({
         where: { id }
     });
 }
@@ -174,6 +174,21 @@ export async function increaseVariantStock(
       stock: {
         increment: quantity,
       },
+    },
+  });
+}
+
+export async function updateVariantStock(
+  id,
+  stock,
+  db = prisma
+) {
+  return db.productVariant.update({
+    where: {
+      id,
+    },
+    data: {
+      stock,
     },
   });
 }
