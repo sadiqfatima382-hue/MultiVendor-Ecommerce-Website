@@ -160,3 +160,20 @@ export async function findProductWeightById(id) {
     });
 
 };
+
+export async function increaseVariantStock(
+  id,
+  quantity,
+  db = prisma
+) {
+  return db.productVariant.update({
+    where: {
+      id,
+    },
+    data: {
+      stock: {
+        increment: quantity,
+      },
+    },
+  });
+}
