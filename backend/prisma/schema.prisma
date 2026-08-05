@@ -96,6 +96,14 @@ enum PurchaseStatus {
   CANCELLED
 }
 
+enum InventoryType {
+  PURCHASE_RECEIVED
+  PURCHASE_RETURN
+  SALE
+  SALE_RETURN
+  ADJUSTMENT
+}
+
 model Role {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -164,6 +172,8 @@ model User {
   orders                   Order[]
   wishlists                Wishlist[]
   qualityControlsInspected QualityControl[]
+  goodsReceipts GoodsReceipt[]
+  inventoryLedgers InventoryLedger[]
 
   createdSuppliers Supplier[] @relation("CreatedSuppliers")
   createdPurchases Purchase[] @relation("CreatedPurchases")
@@ -391,6 +401,7 @@ model ProductVariant {
   weight ProductWeight? @relation(fields: [weightId], references: [id])
 
   cartItems CartItem[]
+  inventoryLedgers InventoryLedger[]
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -741,6 +752,7 @@ model Purchase {
   approvedBy   User? @relation("PurchaseApprovedBy", fields: [approvedById], references: [id])
 
   approvedAt DateTime?
+  goodsReceipts GoodsReceipt[]
 
   @@index([supplierId])
   @@index([vendorId])
@@ -766,6 +778,7 @@ model PurchaseItem {
   total Decimal @db.Decimal(10, 2)
 
   receivedQuantity Int @default(0)
+  goodsReceiptItems GoodsReceiptItem[]
 
   createdAt DateTime @default(now())
 
@@ -817,3 +830,54 @@ model Sequence {
   updatedAt DateTime @updatedAt
 }
 
+model GoodsReceipt {
+  id String @id @default(cuid())
+
+  receiptNumber String @unique
+
+  purchaseId String
+  purchase Purchase @relation(fields: [purchaseId], references: [id])
+
+  receivedById String
+  receivedBy User @relation(fields: [receivedById], references: [id])
+
+  notes String?
+
+  items GoodsReceiptItem[]
+
+  createdAt DateTime @default(now())
+}
+
+model GoodsReceiptItem {
+  id String @id @default(cuid())
+
+  goodsReceiptId String
+  goodsReceipt GoodsReceipt @relation(fields: [goodsReceiptId], references: [id])
+
+  purchaseItemId String
+  purchaseItem PurchaseItem @relation(fields: [purchaseItemId], references: [id])
+
+  quantityReceived Int
+
+  createdAt DateTime @default(now())
+}
+
+model InventoryLedger {
+  id String @id @default(cuid())
+
+  productVariantId String
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
+
+  type InventoryType
+
+  quantity Int
+
+  referenceId String?
+
+  notes String?
+
+  createdById String
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+}
