@@ -3,10 +3,14 @@ import prisma from "../config/prisma.js"
 export async function createGoodsReceipt(data, db = prisma) {
     return db.goodsReceipt.create({
         data,
+        include: {
+            items: true,
+            purchase: true,
+        }
     });
 }
 
-export async function findGoodsReceiptbyId(data, db = prisma) {
+export async function findGoodsReceiptById(data, db = prisma) {
     return db.goodsReceipt.findUnique({
         where: { id },
         include: {
