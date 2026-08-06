@@ -35,6 +35,7 @@ import goodsReceiptRoutes from "./routes/goodsReceipt.routes.js"
 import inventoryAdjustmentRoutes from "./routes/inventoryAdjustment.routes.js"
 import couponRoutes from "./routes/coupon.routes.js"
 import websiteSettingRoutes from "./routes/websiteSetting.routes.js"
+import websiteIconRoutes from "./routes/websiteIcon.routes.js"
 const app = express();
 
 // Middleware
@@ -75,7 +76,8 @@ app.use("/api/approve", approveRoutes)
 app.use("/api/goods-receipts", goodsReceiptRoutes);
 app.use("/api/inventory-adjustments", inventoryAdjustmentRoutes);
 app.use("/api/coupons", couponRoutes);
-app.use(  "/api/website-settings",  websiteSettingRoutes);
+app.use("/api/website-settings", websiteSettingRoutes);
+app.use("/api/website-icons", websiteIconRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
