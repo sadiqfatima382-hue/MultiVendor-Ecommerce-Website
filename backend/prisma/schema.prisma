@@ -1007,3 +1007,44 @@ model CouponUsage {
   @@index([couponId])
   @@index([userId])
 }
+
+model WebsiteSetting {
+  id String @id @default(cuid())
+
+  siteName String
+
+  tagline String?
+
+  description String?
+
+  logo String?
+
+  favicon String?
+
+  email String?
+
+  phone String?
+
+  address String?
+
+  currency String @default("PKR")
+
+  timezone String @default("Asia/Karachi")
+
+  maintenanceMode Boolean @default(false)
+
+  copyrightText String?
+
+  facebook String?
+  instagram String?
+  twitter String?
+  youtube String?
+  linkedin String?
+
+  seoTitle String?
+  seoDescription String?
+  seoKeywords String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
