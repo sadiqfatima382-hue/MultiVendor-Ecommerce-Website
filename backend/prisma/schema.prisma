@@ -114,6 +114,12 @@ enum InventoryLedgerType {
   ADJUSTMENT
 }
 
+enum DiscountType {
+  FIXED
+
+  PERCENTAGE
+}
+
 model Role {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -176,19 +182,21 @@ model User {
   cart          Cart?
   addresses     Address[]
 
-  createdAt                DateTime         @default(now())
-  updatedAt                DateTime         @updatedAt
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
   vendor                   Vendor?
   orders                   Order[]
   wishlists                Wishlist[]
   qualityControlsInspected QualityControl[]
-  goodsReceipts GoodsReceipt[]
-  inventoryLedgers InventoryLedger[]
-  inventoryAdjustments InventoryAdjustment[]
+  goodsReceipts            GoodsReceipt[]
+  inventoryLedgers         InventoryLedger[]
+  inventoryAdjustments     InventoryAdjustment[]
 
-  createdSuppliers Supplier[] @relation("CreatedSuppliers")
-  createdPurchases Purchase[] @relation("CreatedPurchases")
-  approvedPurchases Purchase[] @relation("PurchaseApprovedBy")
+  createdSuppliers  Supplier[]    @relation("CreatedSuppliers")
+  createdPurchases  Purchase[]    @relation("CreatedPurchases")
+  approvedPurchases Purchase[]    @relation("PurchaseApprovedBy")
+  couponUsages      CouponUsage[]
+
   @@index([roleId])
   @@index([email])
 }
@@ -409,10 +417,10 @@ model ProductVariant {
 
   color ProductColor? @relation(fields: [colorId], references: [id])
 
-  weight ProductWeight? @relation(fields: [weightId], references: [id])
+  weight          ProductWeight?            @relation(fields: [weightId], references: [id])
   adjustmentItems InventoryAdjustmentItem[]
 
-  cartItems CartItem[]
+  cartItems        CartItem[]
   inventoryLedgers InventoryLedger[]
 
   createdAt     DateTime       @default(now())
@@ -569,26 +577,25 @@ model Address {
 }
 
 model Order {
-
   id String @id @default(cuid())
 
   orderNumber String? @unique
 
   userId String
-  user User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
 
   addressId String
-  address Address @relation(fields: [addressId], references: [id])
+  address   Address @relation(fields: [addressId], references: [id])
 
-  subtotal Decimal @db.Decimal(10,2)
+  subtotal Decimal @db.Decimal(10, 2)
 
-  shipping Decimal @default(0) @db.Decimal(10,2)
+  shipping Decimal @default(0) @db.Decimal(10, 2)
 
-  discount Decimal @default(0) @db.Decimal(10,2)
+  discount Decimal @default(0) @db.Decimal(10, 2)
 
-  tax Decimal @default(0) @db.Decimal(10,2)
+  tax Decimal @default(0) @db.Decimal(10, 2)
 
-  grandTotal Decimal @db.Decimal(10,2)
+  grandTotal Decimal @db.Decimal(10, 2)
 
   paymentStatus PaymentStatus @default(PENDING)
 
@@ -604,24 +611,24 @@ model Order {
 
   createdAt DateTime @default(now())
 
-  updatedAt DateTime @updatedAt
+  updatedAt    DateTime      @updatedAt
+  couponUsages CouponUsage[]
 }
 
 model VendorOrder {
-
   id String @id @default(cuid())
 
   vendorOrderNumber String? @unique
 
   orderId String
-  order Order @relation(fields: [orderId], references: [id])
+  order   Order  @relation(fields: [orderId], references: [id])
 
   vendorId String
-  vendor Vendor @relation(fields: [vendorId], references: [id])
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
 
-  subtotal Decimal @db.Decimal(10,2)
+  subtotal Decimal @db.Decimal(10, 2)
 
-  grandTotal Decimal? @db.Decimal(10,2)
+  grandTotal Decimal? @db.Decimal(10, 2)
 
   status OrderStatus @default(PENDING)
 
@@ -638,13 +645,13 @@ model OrderItem {
   id String @id @default(cuid())
 
   vendorOrderId String
-  vendorOrder VendorOrder @relation(fields: [vendorOrderId], references: [id])
+  vendorOrder   VendorOrder @relation(fields: [vendorOrderId], references: [id])
 
   productId String
-  product Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 
   productVariantId String
-  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
 
   productName String
 
@@ -654,9 +661,9 @@ model OrderItem {
 
   quantity Int
 
-  price Decimal @db.Decimal(10,2)
+  price Decimal @db.Decimal(10, 2)
 
-  total Decimal @db.Decimal(10,2)
+  total Decimal @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
 }
@@ -777,9 +784,9 @@ model Purchase {
   updatedAt DateTime @updatedAt
 
   approvedById String?
-  approvedBy   User? @relation("PurchaseApprovedBy", fields: [approvedById], references: [id])
+  approvedBy   User?   @relation("PurchaseApprovedBy", fields: [approvedById], references: [id])
 
-  approvedAt DateTime?
+  approvedAt    DateTime?
   goodsReceipts GoodsReceipt[]
 
   @@index([supplierId])
@@ -805,7 +812,7 @@ model PurchaseItem {
 
   total Decimal @db.Decimal(10, 2)
 
-  receivedQuantity Int @default(0)
+  receivedQuantity  Int                @default(0)
   goodsReceiptItems GoodsReceiptItem[]
 
   createdAt DateTime @default(now())
@@ -864,10 +871,10 @@ model GoodsReceipt {
   receiptNumber String @unique
 
   purchaseId String
-  purchase Purchase @relation(fields: [purchaseId], references: [id])
+  purchase   Purchase @relation(fields: [purchaseId], references: [id])
 
   receivedById String
-  receivedBy User @relation(fields: [receivedById], references: [id])
+  receivedBy   User   @relation(fields: [receivedById], references: [id])
 
   notes String?
 
@@ -880,10 +887,10 @@ model GoodsReceiptItem {
   id String @id @default(cuid())
 
   goodsReceiptId String
-  goodsReceipt GoodsReceipt @relation(fields: [goodsReceiptId], references: [id])
+  goodsReceipt   GoodsReceipt @relation(fields: [goodsReceiptId], references: [id])
 
   purchaseItemId String
-  purchaseItem PurchaseItem @relation(fields: [purchaseItemId], references: [id])
+  purchaseItem   PurchaseItem @relation(fields: [purchaseItemId], references: [id])
 
   quantityReceived Int
 
@@ -894,7 +901,7 @@ model InventoryLedger {
   id String @id @default(cuid())
 
   productVariantId String
-  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
 
   type InventoryType
 
@@ -905,7 +912,7 @@ model InventoryLedger {
   notes String?
 
   createdById String
-  createdBy User @relation(fields: [createdById], references: [id])
+  createdBy   User   @relation(fields: [createdById], references: [id])
 
   createdAt DateTime @default(now())
 }
@@ -920,7 +927,7 @@ model InventoryAdjustment {
   notes String?
 
   createdById String
-  createdBy User @relation(fields: [createdById], references: [id])
+  createdBy   User   @relation(fields: [createdById], references: [id])
 
   items InventoryAdjustmentItem[]
 
@@ -932,10 +939,10 @@ model InventoryAdjustmentItem {
   id String @id @default(cuid())
 
   adjustmentId String
-  adjustment InventoryAdjustment @relation(fields: [adjustmentId], references: [id], onDelete: Cascade)
+  adjustment   InventoryAdjustment @relation(fields: [adjustmentId], references: [id], onDelete: Cascade)
 
   productVariantId String
-  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
 
   previousStock Int
 
@@ -944,4 +951,59 @@ model InventoryAdjustmentItem {
   difference Int
 
   createdAt DateTime @default(now())
+}
+
+model Coupon {
+  id String @id @default(cuid())
+
+  code String @unique
+
+  name String
+
+  description String?
+
+  discountType DiscountType
+
+  discountValue Decimal @db.Decimal(10, 2)
+
+  minimumOrderAmount Decimal? @db.Decimal(10, 2)
+
+  maximumDiscount Decimal? @db.Decimal(10, 2)
+
+  usageLimit Int?
+
+  usedCount Int @default(0)
+
+  perUserLimit Int @default(1)
+
+  startsAt DateTime?
+
+  expiresAt DateTime?
+
+  isActive Boolean @default(true)
+
+  usages CouponUsage[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model CouponUsage {
+  id String @id @default(cuid())
+
+  couponId String
+  coupon   Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  usedAt DateTime @default(now())
+
+  @@unique([couponId, userId, orderId])
+  @@index([couponId])
+  @@index([userId])
 }
