@@ -3,7 +3,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/authorize.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { createWebsiteSetting, getWebsiteSetting, updateWebsiteSetting, } from "../controllers/websiteSetting.controller.js";
-import { createWebsiteSettingSchema, updateWebsiteSettingSchema, } from "../validators/purchase/websiteSetting.validation.js";
+import { createWebsiteSettingSchema, updateWebsiteSettingSchema, } from "../validators/website/websiteSetting.validation.js";
 
 const router = express.Router();
 
