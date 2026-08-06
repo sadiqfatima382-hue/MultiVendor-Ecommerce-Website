@@ -120,6 +120,16 @@ enum DiscountType {
   PERCENTAGE
 }
 
+enum WebsiteIconType {
+  LOGO
+  DARK_LOGO
+  MOBILE_LOGO
+  FOOTER_LOGO
+  ADMIN_LOGO
+  EMAIL_LOGO
+  FAVICON
+}
+
 model Role {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -1044,6 +1054,21 @@ model WebsiteSetting {
   seoTitle String?
   seoDescription String?
   seoKeywords String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WebsiteIcon {
+  id String @id @default(cuid())
+
+  type WebsiteIconType @unique
+
+  imageUrl String
+
+  imagePublicId String
+
+  altText String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
