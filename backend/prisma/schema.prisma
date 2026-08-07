@@ -1083,7 +1083,52 @@ model ComponentType {
   description String?
 
   isActive Boolean @default(true)
+  homePageComponents HomePageComponent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model HomePage {
+  id String @id @default(cuid())
+
+  name String
+  slug String @unique
+
+  title String?
+  description String?
+
+  isActive Boolean @default(true)
+
+  components HomePageComponent[]
+  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HomePageComponent {
+  id String @id @default(cuid())
+
+  homePageId String
+  homePage   HomePage @relation(fields:[homePageId], references: [id], onDelete: Cascade )
+
+  componentTypeId String
+  componentType   ComponentType @relation( fields:[componentTypeId], references: [id])
+
+  title String?
+
+  // Flexible component-specific configuration
+  content Json?
+
+  sortOrder Int @default(0)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([homePageId])
+  @@index([componentTypeId])
+  @@unique([homePageId, sortOrder])
 }
