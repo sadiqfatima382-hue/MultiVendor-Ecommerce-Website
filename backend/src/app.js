@@ -37,6 +37,7 @@ import couponRoutes from "./routes/coupon.routes.js"
 import websiteSettingRoutes from "./routes/websiteSetting.routes.js"
 import websiteIconRoutes from "./routes/websiteIcon.routes.js"
 import componentTypeRoutes from "./routes/componentType.routes.js";
+import homePageRoutes from "./routes/homePage.routes.js";
 const app = express();
 
 // Middleware
@@ -80,6 +81,7 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/website-settings", websiteSettingRoutes);
 app.use("/api/website-icons", websiteIconRoutes);
 app.use("/api/component-types", componentTypeRoutes);
+app.use("/api/home-pages", homePageRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({

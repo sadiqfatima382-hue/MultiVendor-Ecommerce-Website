@@ -1,30 +1,9 @@
-import {
-  createHomePage,
-  findHomePageById,
-  findHomePageBySlug,
-  findHomePageByName,
-  findHomePages,
-  countHomePages,
-  updateHomePage,
-  deleteHomePage,
-} from "../repositories/homePage.repository.js";
-
-import {
-  createHomePageComponent,
-  findHomePageComponentById,
-  findHomePageComponents,
-  findComponentTypeById,
-  updateHomePageComponent,
-  deleteHomePageComponent,
-} from "../repositories/homePageComponent.repository.js";
-
-import { generateSlug } from "../utils/generateSlug.js";
+import {  createHomePage,  findHomePageById,  findHomePageBySlug,  findHomePageByName,  findHomePages,  countHomePages,  updateHomePage,  deleteHomePage,} from "../repositories/homePage.repository.js";
+import {  createHomePageComponent,  findHomePageComponentById,  findHomePageComponents,  findComponentTypeById,  updateHomePageComponent,  deleteHomePageComponent,} from "../repositories/homePageComponent.repository.js";
+import { generateSlug } from "../utils/slug.js";
 import { getPagination } from "../utils/pagination.js";
 
-
-// =====================================================
 // CREATE HOME PAGE
-// =====================================================
 
 export async function createHomePageService(data) {
   const {
@@ -121,10 +100,7 @@ export async function createHomePageService(data) {
   });
 }
 
-
-// =====================================================
 // GET HOME PAGES
-// =====================================================
 
 export async function getHomePagesService({
   page = 1,
@@ -197,10 +173,7 @@ export async function getHomePagesService({
   };
 }
 
-
-// =====================================================
 // GET HOME PAGE BY ID
-// =====================================================
 
 export async function getHomePageByIdService(
   id
@@ -217,10 +190,7 @@ export async function getHomePageByIdService(
   return homePage;
 }
 
-
-// =====================================================
 // GET HOME PAGE COMPONENTS
-// =====================================================
 
 export async function getHomePageComponentsService(
   homePageId
@@ -239,10 +209,7 @@ export async function getHomePageComponentsService(
   );
 }
 
-
-// =====================================================
 // UPDATE HOME PAGE
-// =====================================================
 
 export async function updateHomePageService(
   id,
@@ -259,10 +226,8 @@ export async function updateHomePageService(
 
   const updateData = {};
 
-  // -------------------------
   // Name
-  // -------------------------
-
+  
   if (data.name !== undefined) {
     const existingName =
       await findHomePageByName(
@@ -302,10 +267,7 @@ export async function updateHomePageService(
       newSlug;
   }
 
-  // -------------------------
   // Other fields
-  // -------------------------
-
   if (data.title !== undefined) {
     updateData.title =
       data.title;
@@ -331,10 +293,7 @@ export async function updateHomePageService(
   );
 }
 
-
-// =====================================================
 // ADD COMPONENT TO HOME PAGE
-// =====================================================
 
 export async function addHomePageComponentService(
   homePageId,
@@ -409,11 +368,7 @@ export async function addHomePageComponentService(
   });
 }
 
-
-// =====================================================
 // UPDATE HOME PAGE COMPONENT
-// =====================================================
-
 export async function updateHomePageComponentService(
   id,
   data
@@ -431,11 +386,8 @@ export async function updateHomePageComponentService(
 
   const updateData = {};
 
-  // -------------------------
-  // Component Type
-  // -------------------------
-
-  if (
+   // Component Type
+   if (
     data.componentTypeId !==
     undefined
   ) {
@@ -460,10 +412,7 @@ export async function updateHomePageComponentService(
       data.componentTypeId;
   }
 
-  // -------------------------
   // Sort Order
-  // -------------------------
-
   if (
     data.sortOrder !== undefined
   ) {
@@ -490,11 +439,8 @@ export async function updateHomePageComponentService(
       data.sortOrder;
   }
 
-  // -------------------------
-  // Other fields
-  // -------------------------
-
-  if (data.title !== undefined) {
+    // Other fields
+    if (data.title !== undefined) {
     updateData.title =
       data.title;
   }
@@ -519,11 +465,7 @@ export async function updateHomePageComponentService(
   );
 }
 
-
-// =====================================================
 // DELETE HOME PAGE COMPONENT
-// =====================================================
-
 export async function deleteHomePageComponentService(
   id
 ) {
@@ -543,11 +485,7 @@ export async function deleteHomePageComponentService(
   );
 }
 
-
-// =====================================================
 // DELETE HOME PAGE
-// =====================================================
-
 export async function deleteHomePageService(
   id
 ) {
