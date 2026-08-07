@@ -3,7 +3,7 @@ import { createBannerService, getBannersService, getBannerByIdService, updateBan
 export async function createBanner(req, res) {
     try {
         const banner = await createBannerService(
-            req.body,
+            req.validatedData.body,
             req.file
         );
 
