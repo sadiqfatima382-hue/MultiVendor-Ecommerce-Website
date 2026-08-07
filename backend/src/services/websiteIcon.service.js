@@ -1,32 +1,35 @@
 import { createWebsiteIcon, findWebsiteIconById, findWebsiteIconByType, getWebsiteIcons, updateWebsiteIcon, deleteWebsiteIcon, } from "../repositories/websiteIcon.repository.js";
 import { uploadImageToCloudinary, deleteImageFromCloudinary, } from "../utils/cloudinary.js";
 
-export async function createWebsiteIconService(body, file) {
-    const existing =
-        await findWebsiteIconByType(body.type);
+export async function createWebsiteIconService(
+  body,
+  file
+) {
+  const existing =
+    await findWebsiteIconByType(body.type);
 
-    if (existing) {
-        throw new Error(
-            "This icon type already exists."
-        );
-    }
+  if (existing) {
+    throw new Error(
+      "This icon type already exists."
+    );
+  }
 
-    if (!file) {
-        throw new Error("Image is required.");
-    }
+  if (!file) {
+    throw new Error("Image is required.");
+  }
 
-    const uploaded =
-        await uploadImageToCloudinary(
-            file.buffer,
-            "website-icons"
-        );
+  const uploaded =
+    await uploadImageToCloudinary(
+      file.buffer,
+      "website-icons"
+    );
 
-    return createWebsiteIcon({
-        type: body.type,
-        imageUrl: uploaded.secure_url,
-        imagePublicId: uploaded.public_id,
-        altText: body.altText,
-    });
+  return createWebsiteIcon({
+    type: body.type,
+    imageUrl: uploaded.secure_url,
+    imagePublicId: uploaded.public_id,
+    altText: body.altText,
+  });
 }
 
 export async function getWebsiteIconsService() {

@@ -16,6 +16,19 @@ router.post(
     validate(createWebsiteIconSchema),
     createWebsiteIcon
 );
+// router.post(
+//   "/",
+//   upload.single("image"),
+//   (req, res) => {
+//     console.log("BODY:", req.body);
+//     console.log("FILE:", req.file);
+
+//     return res.json({
+//       body: req.body,
+//       file: req.file,
+//     });
+//   }
+// );
 
 router.get(
     "/",
