@@ -39,6 +39,7 @@ import websiteIconRoutes from "./routes/websiteIcon.routes.js"
 import componentTypeRoutes from "./routes/componentType.routes.js";
 import homePageRoutes from "./routes/homePage.routes.js";
 import bannerRoutes from "./routes/banner.routes.js";
+import adsBannerRoutes from "./routes/adsBanner.routes.js";
 const app = express();
 
 // Middleware
@@ -84,6 +85,7 @@ app.use("/api/website-icons", websiteIconRoutes);
 app.use("/api/component-types", componentTypeRoutes);
 app.use("/api/home-pages", homePageRoutes);
 app.use("/api/banners", bannerRoutes);
+app.use("/api/ads-banners", adsBannerRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
