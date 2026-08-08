@@ -1,5 +1,4 @@
 import { createCoupon, findCouponById, findCouponByCode, getCoupons, countCoupons, updateCoupon, deleteCoupon, countCouponUsageByUser, } from "../repositories/coupon.repository.js";
-
 export async function createCouponService(body) {
     const existingCoupon = await findCouponByCode(
         body.code.toUpperCase()
