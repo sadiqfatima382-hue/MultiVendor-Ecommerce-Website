@@ -1,18 +1,14 @@
 import prisma from "../config/prisma.js";
 
 export async function createAdsBanner(
-  data,
-  db = prisma
-) {
+  data,  db = prisma) {
   return db.adsBanner.create({
     data,
   });
 }
 
 export async function findAdsBannerById(
-  id,
-  db = prisma
-) {
+  id, db = prisma) {
   return db.adsBanner.findUnique({
     where: {
       id,
