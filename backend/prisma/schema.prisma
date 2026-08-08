@@ -130,6 +130,18 @@ enum WebsiteIconType {
   FAVICON
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PENDING
+}
+
+enum SubscriptionBillingCycle {
+  MONTHLY
+  YEARLY
+}
+
 model Role {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -201,6 +213,7 @@ model User {
   goodsReceipts            GoodsReceipt[]
   inventoryLedgers         InventoryLedger[]
   inventoryAdjustments     InventoryAdjustment[]
+  subscriptions            UserSubscription[]
 
   createdSuppliers  Supplier[]    @relation("CreatedSuppliers")
   createdPurchases  Purchase[]    @relation("CreatedPurchases")
@@ -1208,4 +1221,52 @@ model ApiConfig {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SubscriptionPlan {
+  id String @id @default(cuid())
+
+  name String @unique
+  description String?
+
+  price Decimal @db.Decimal(10, 2)
+
+  billingCycle SubscriptionBillingCycle
+
+  features Json?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions UserSubscription[]
+
+  @@index([isActive])
+}
+
+model UserSubscription {
+  id String @id @default(cuid())
+
+  userId String
+  planId String
+
+  status SubscriptionStatus @default(PENDING)
+
+  startDate DateTime?
+  endDate DateTime?
+
+  cancelledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id],  onDelete: Cascade)
+
+  plan SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
+  @@index([endDate])
 }
