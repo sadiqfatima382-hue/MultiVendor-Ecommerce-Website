@@ -40,6 +40,7 @@ import componentTypeRoutes from "./routes/componentType.routes.js";
 import homePageRoutes from "./routes/homePage.routes.js";
 import bannerRoutes from "./routes/banner.routes.js";
 import adsBannerRoutes from "./routes/adsBanner.routes.js";
+import apiConfigRoutes from "./routes/apiConfig.routes.js";
 const app = express();
 
 // Middleware
@@ -86,6 +87,7 @@ app.use("/api/component-types", componentTypeRoutes);
 app.use("/api/home-pages", homePageRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/ads-banners", adsBannerRoutes);
+app.use("/api/api-config", apiConfigRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
