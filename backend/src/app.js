@@ -43,6 +43,7 @@ import adsBannerRoutes from "./routes/adsBanner.routes.js";
 import apiConfigRoutes from "./routes/apiConfig.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
 import contactSettingRoutes from "./routes/contactSetting.routes.js";
+import blogPostRoutes from "./routes/blogPost.routes.js";
 
 const app = express();
 
@@ -93,6 +94,7 @@ app.use("/api/ads-banners", adsBannerRoutes);
 app.use("/api/api-config", apiConfigRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/contact-settings", contactSettingRoutes);
+app.use(  "/api/blog-posts",  blogPostRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
