@@ -1325,3 +1325,38 @@ model BlogPost {
   @@index([isFeatured])
   @@index([createdAt])
 }
+
+model Career {
+  id String @id @default(cuid())
+
+  title String
+  slug String @unique
+
+  department String?
+  location String?
+  employmentType String?
+
+  description String
+  requirements String?
+  responsibilities String?
+
+  salaryMin Decimal? @db.Decimal(12, 2)
+  salaryMax Decimal? @db.Decimal(12, 2)
+  salaryCurrency String? @default("PKR")
+
+  vacancies Int @default(1)
+
+  isPublished Boolean @default(false)
+  isActive Boolean @default(true)
+
+  publishedAt DateTime?
+  applicationDeadline DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([isActive])
+  @@index([department])
+  @@index([createdAt])
+}
