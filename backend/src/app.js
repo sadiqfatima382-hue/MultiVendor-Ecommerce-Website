@@ -42,6 +42,8 @@ import bannerRoutes from "./routes/banner.routes.js";
 import adsBannerRoutes from "./routes/adsBanner.routes.js";
 import apiConfigRoutes from "./routes/apiConfig.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
+import contactSettingRoutes from "./routes/contactSetting.routes.js";
+
 const app = express();
 
 // Middleware
@@ -90,6 +92,7 @@ app.use("/api/banners", bannerRoutes);
 app.use("/api/ads-banners", adsBannerRoutes);
 app.use("/api/api-config", apiConfigRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/contact-settings", contactSettingRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
