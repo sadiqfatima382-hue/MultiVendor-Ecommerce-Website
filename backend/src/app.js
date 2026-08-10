@@ -41,6 +41,7 @@ import homePageRoutes from "./routes/homePage.routes.js";
 import bannerRoutes from "./routes/banner.routes.js";
 import adsBannerRoutes from "./routes/adsBanner.routes.js";
 import apiConfigRoutes from "./routes/apiConfig.routes.js";
+import subscriptionRoutes from "./routes/subscription.routes.js";
 const app = express();
 
 // Middleware
@@ -88,6 +89,7 @@ app.use("/api/home-pages", homePageRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/ads-banners", adsBannerRoutes);
 app.use("/api/api-config", apiConfigRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
