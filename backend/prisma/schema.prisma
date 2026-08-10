@@ -1270,3 +1270,28 @@ model UserSubscription {
   @@index([status])
   @@index([endDate])
 }
+
+model ContactSetting {
+  id String @id @default(cuid())
+
+  email String?
+  phone String?
+  whatsapp String?
+
+  address String?
+
+  googleMapUrl String?
+
+  workingHours String?
+
+  facebookUrl String?
+  instagramUrl String?
+  twitterUrl String?
+  linkedinUrl String?
+  youtubeUrl String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
