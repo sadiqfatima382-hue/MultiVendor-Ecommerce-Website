@@ -142,6 +142,25 @@ enum SubscriptionBillingCycle {
   YEARLY
 }
 
+enum CustomerReturnStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  RECEIVED
+  REFUNDED
+}
+
+enum CustomerReturnReason {
+  DAMAGED
+  WRONG_ITEM
+  DEFECTIVE
+  NOT_AS_DESCRIBED
+  SIZE_ISSUE
+  QUALITY_ISSUE
+  CHANGED_MIND
+  OTHER
+}
+
 model Role {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -215,6 +234,7 @@ model User {
   inventoryAdjustments     InventoryAdjustment[]
   subscriptions            UserSubscription[]
   blogPosts                BlogPost[]
+  customerReturns          CustomerReturn[]
 
   createdSuppliers  Supplier[]    @relation("CreatedSuppliers")
   createdPurchases  Purchase[]    @relation("CreatedPurchases")
@@ -404,6 +424,7 @@ model Product {
 
   variants ProductVariant[]
   images   ProductImage[]
+  customerReturnItems CustomerReturnItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -451,6 +472,7 @@ model ProductVariant {
   updatedAt     DateTime       @updatedAt
   orderItems    OrderItem[]
   purchaseItems PurchaseItem[]
+  customerReturnItems CustomerReturnItem[]
 }
 
 model ProductImage {
@@ -637,6 +659,7 @@ model Order {
 
   updatedAt    DateTime      @updatedAt
   couponUsages CouponUsage[]
+  customerReturns CustomerReturn[]
 }
 
 model VendorOrder {
@@ -682,6 +705,7 @@ model OrderItem {
   productSku String
 
   productImage String?
+  customerReturnItems CustomerReturnItem[]
 
   quantity Int
 
@@ -1359,4 +1383,70 @@ model Career {
   @@index([isActive])
   @@index([department])
   @@index([createdAt])
+}
+
+model CustomerReturn {
+  id String @id @default(cuid())
+
+  returnNumber String @unique
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+
+  orderId String
+  order   Order @relation(fields: [orderId], references: [id])
+
+  status CustomerReturnStatus @default(REQUESTED)
+
+  refundAmount Decimal? @db.Decimal(10, 2)
+
+  customerNotes String?
+  adminNotes String?
+
+  requestedAt DateTime @default(now())
+  approvedAt DateTime?
+  rejectedAt DateTime?
+  receivedAt DateTime?
+  refundedAt DateTime?
+
+  items CustomerReturnItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model CustomerReturnItem {
+  id String @id @default(cuid())
+
+  returnId String
+  return   CustomerReturn @relation(fields: [returnId],references: [id],onDelete: Cascade)
+
+  orderItemId String
+  orderItem   OrderItem @relation(fields: [orderItemId],references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId],references: [id])
+
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId],references: [id])
+
+  quantity Int
+
+  reason CustomerReturnReason
+
+  reasonNotes String?
+
+  refundAmount Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+
+  @@index([returnId])
+  @@index([orderItemId])
+  @@index([productId])
+  @@index([productVariantId])
 }

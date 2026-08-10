@@ -95,8 +95,8 @@ app.use("/api/ads-banners", adsBannerRoutes);
 app.use("/api/api-config", apiConfigRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/contact-settings", contactSettingRoutes);
-app.use(  "/api/blog-posts",  blogPostRoutes);
-app.use(  "/api/careers",  careerRoutes);
+app.use("/api/blog-posts", blogPostRoutes);
+app.use("/api/careers", careerRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
