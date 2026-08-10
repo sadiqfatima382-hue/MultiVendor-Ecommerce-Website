@@ -44,6 +44,7 @@ import apiConfigRoutes from "./routes/apiConfig.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
 import contactSettingRoutes from "./routes/contactSetting.routes.js";
 import blogPostRoutes from "./routes/blogPost.routes.js";
+import careerRoutes from "./routes/career.routes.js";
 
 const app = express();
 
@@ -95,6 +96,7 @@ app.use("/api/api-config", apiConfigRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/contact-settings", contactSettingRoutes);
 app.use(  "/api/blog-posts",  blogPostRoutes);
+app.use(  "/api/careers",  careerRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
