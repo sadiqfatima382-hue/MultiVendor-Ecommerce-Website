@@ -45,6 +45,7 @@ import subscriptionRoutes from "./routes/subscription.routes.js";
 import contactSettingRoutes from "./routes/contactSetting.routes.js";
 import blogPostRoutes from "./routes/blogPost.routes.js";
 import careerRoutes from "./routes/career.routes.js";
+import customerReturnRoutes from "./routes/customerReturn.routes.js";
 
 const app = express();
 
@@ -97,6 +98,7 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/contact-settings", contactSettingRoutes);
 app.use("/api/blog-posts", blogPostRoutes);
 app.use("/api/careers", careerRoutes);
+app.use("/api/customer-returns", customerReturnRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({
