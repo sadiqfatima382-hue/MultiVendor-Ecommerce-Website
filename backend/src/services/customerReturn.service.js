@@ -553,7 +553,7 @@ export async function rejectCustomerReturnService(
 // =====================================================
 
 export async function receiveCustomerReturnService(
-  returnId
+  returnId, adminUserId
 ) {
   const customerReturn =
     await findCustomerReturnById(
