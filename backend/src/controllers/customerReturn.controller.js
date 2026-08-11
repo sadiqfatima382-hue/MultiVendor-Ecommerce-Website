@@ -1,249 +1,259 @@
-import prisma from "../config/prisma.js";
+import {
+  createCustomerReturnService,
+  getCustomerReturnByIdService,
+  getCustomerReturnsService,
+  approveCustomerReturnService,
+  rejectCustomerReturnService,
+  receiveCustomerReturnService,
+  refundCustomerReturnService,
+  deleteCustomerReturnService,
+} from "../services/customerReturn.service.js";
 
 // =====================================================
 // CREATE RETURN
 // =====================================================
 
-export async function createCustomerReturn(
-  data,
-  db = prisma
-) {
-  return db.customerReturn.create({
-    data,
-    include: {
-      items: true,
-    },
-  });
-}
+export async function createCustomerReturn(req, res) {
+  try {
+    const result =
+      await createCustomerReturnService(
+        req.user.id,
+        req.validatedData.body
+      );
 
-// =====================================================
-// FIND RETURN BY ID
-// =====================================================
-
-export async function findCustomerReturnById(
-  id,
-  db = prisma
-) {
-  return db.customerReturn.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      items: {
-        include: {
-          orderItem: true,
-          product: true,
-          productVariant: true,
-        },
-      },
-      user: true,
-      order: true,
-    },
-  });
-}
-
-// =====================================================
-// FIND BY RETURN NUMBER
-// =====================================================
-
-export async function findCustomerReturnByNumber(
-  returnNumber,
-  db = prisma
-) {
-  return db.customerReturn.findUnique({
-    where: {
-      returnNumber,
-    },
-  });
-}
-
-// =====================================================
-// FIND RETURNS
-// =====================================================
-
-export async function findCustomerReturns(
-  {
-    skip,
-    take,
-    where,
-    orderBy,
-  },
-  db = prisma
-) {
-  return db.customerReturn.findMany({
-    skip,
-    take,
-    where,
-    orderBy,
-
-    include: {
-      items: {
-        include: {
-          product: true,
-          productVariant: true,
-          orderItem: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      order: {
-        select: {
-          id: true,
-          orderNumber: true,
-          grandTotal: true,
-          paymentStatus: true,
-          status: true,
-        },
-      },
-    },
-  });
-}
-
-// =====================================================
-// COUNT RETURNS
-// =====================================================
-
-export async function countCustomerReturns(
-  where,
-  db = prisma
-) {
-  return db.customerReturn.count({
-    where,
-  });
-}
-
-// =====================================================
-// UPDATE RETURN
-// =====================================================
-
-export async function updateCustomerReturn(
-  id,
-  data,
-  db = prisma
-) {
-  return db.customerReturn.update({
-    where: {
-      id,
-    },
-    data,
-    include: {
-      items: true,
-    },
-  });
-}
-
-// =====================================================
-// DELETE RETURN
-// =====================================================
-
-export async function deleteCustomerReturn(
-  id,
-  db = prisma
-) {
-  return db.customerReturn.delete({
-    where: {
-      id,
-    },
-  });
-}
-
-// =====================================================
-// FIND ORDER
-// =====================================================
-
-export async function findOrderById(
-  orderId,
-  db = prisma
-) {
-  return db.order.findUnique({
-    where: {
-      id: orderId,
-    },
-
-    include: {
-      user: true,
-
-      vendorOrders: {
-        include: {
-          orderItems: true,
-        },
-      },
-    },
-  });
-}
-
-// =====================================================
-// FIND ORDER ITEM
-// =====================================================
-
-export async function findOrderItemById(
-  orderItemId,
-  db = prisma
-) {
-  return db.orderItem.findUnique({
-    where: {
-      id: orderItemId,
-    },
-  });
-}
-
-// =====================================================
-// FIND PREVIOUSLY RETURNED QUANTITY
-// =====================================================
-
-export async function getReturnedQuantity(
-  orderItemId,
-  db = prisma
-) {
-  const result =
-    await db.customerReturnItem.aggregate({
-      where: {
-        orderItemId,
-
-        return: {
-          status: {
-            not: "REJECTED",
-          },
-        },
-      },
-
-      _sum: {
-        quantity: true,
-      },
+    return res.status(201).json({
+      success: true,
+      message: "Return request created successfully.",
+      data: result,
     });
-
-  return result._sum.quantity || 0;
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 // =====================================================
-// CREATE RETURN ITEM
+// GET MY RETURNS
 // =====================================================
 
-export async function createCustomerReturnItem(
-  data,
-  db = prisma
-) {
-  return db.customerReturnItem.create({
-    data,
-  });
+export async function getMyCustomerReturns(req, res) {
+  try {
+    const result =
+      await getCustomerReturnsService({
+        userId: req.user.id,
+        isAdmin: false,
+        ...req.validatedData.query,
+      });
+
+    return res.status(200).json({
+      success: true,
+      data: result.returns,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 // =====================================================
-// FIND INVENTORY LEDGER ENTRIES
+// GET ALL RETURNS - ADMIN
 // =====================================================
 
-export async function findInventoryLedgerByReference(
-  referenceId,
-  db = prisma
-) {
-  return db.inventoryLedger.findMany({
-    where: {
-      referenceId,
-    },
-  });
+export async function getCustomerReturns(req, res) {
+  try {
+    const result =
+      await getCustomerReturnsService({
+        isAdmin: true,
+        ...req.validatedData.query,
+      });
+
+    return res.status(200).json({
+      success: true,
+      data: result.returns,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+// =====================================================
+// GET RETURN BY ID
+// =====================================================
+
+export async function getCustomerReturnById(req, res) {
+  try {
+    const customerReturn =
+      await getCustomerReturnByIdService(
+        req.validatedData.params.id,
+        req.user.id,
+        false
+      );
+
+    return res.status(200).json({
+      success: true,
+      data: customerReturn,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+// =====================================================
+// GET RETURN BY ID - ADMIN
+// =====================================================
+
+export async function getCustomerReturnByIdAdmin(req, res) {
+  try {
+    const customerReturn =
+      await getCustomerReturnByIdService(
+        req.validatedData.params.id,
+        req.user.id,
+        true
+      );
+
+    return res.status(200).json({
+      success: true,
+      data: customerReturn,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+// =====================================================
+// APPROVE
+// =====================================================
+
+export async function approveCustomerReturn(req, res) {
+  try {
+    const result =
+      await approveCustomerReturnService(
+        req.validatedData.params.id,
+        req.validatedData.body.adminNotes
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Return approved successfully.",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+// =====================================================
+// REJECT
+// =====================================================
+
+export async function rejectCustomerReturn(req, res) {
+  try {
+    const result =
+      await rejectCustomerReturnService(
+        req.validatedData.params.id,
+        req.validatedData.body.adminNotes
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Return rejected successfully.",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+// =====================================================
+// RECEIVE
+// =====================================================
+
+export async function receiveCustomerReturn(req, res) {
+  try {
+    const result =
+      await receiveCustomerReturnService(
+        req.validatedData.params.id,
+        req.user.id
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Return received and inventory updated successfully.",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+// =====================================================
+// REFUND
+// =====================================================
+
+export async function refundCustomerReturn(req, res) {
+  try {
+    const result =
+      await refundCustomerReturnService(
+        req.validatedData.params.id
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Return marked as refunded successfully.",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+// =====================================================
+// DELETE
+// =====================================================
+
+export async function deleteCustomerReturn(req, res) {
+  try {
+    await deleteCustomerReturnService(
+      req.validatedData.params.id,
+      req.user.id,
+      false
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Return request deleted successfully.",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
