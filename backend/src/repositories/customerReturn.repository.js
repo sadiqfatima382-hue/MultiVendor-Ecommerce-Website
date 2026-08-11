@@ -170,7 +170,7 @@ export async function findOrderById(
 
       vendorOrders: {
         include: {
-          orderItems: true,
+          items: true,
         },
       },
     },
