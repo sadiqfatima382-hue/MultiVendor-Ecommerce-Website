@@ -22,13 +22,13 @@ export function initializeSocket(server) {
       socket.user
     );
 
-    const userId = socket.user.id;
+    const userId = socket.user.userId;
 
-    socket.join(`user:${userId}`);
+socket.join(`user:${userId}`);
 
-    console.log(
-      `👤 User ${userId} joined room user:${userId}`
-    );
+console.log(
+  `👤 User ${userId} joined room user:${userId}`
+);
 
     socket.on("disconnect", () => {
       console.log(

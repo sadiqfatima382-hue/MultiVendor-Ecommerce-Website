@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import { verifyAccessToken } from "../utils/jwt.js";
 
 export function socketAuth(socket, next) {
   try {
@@ -11,15 +11,8 @@ export function socketAuth(socket, next) {
       );
     }
 
-    console.log(
-      "JWT_SECRET exists:",
-      !!process.env.JWT_SECRET
-    );
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    const decoded =
+      verifyAccessToken(token);
 
     console.log(
       "✅ Socket JWT decoded:",
