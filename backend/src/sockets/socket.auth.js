@@ -11,17 +11,35 @@ export function socketAuth(socket, next) {
       );
     }
 
+    console.log(
+      "JWT_SECRET exists:",
+      !!process.env.JWT_SECRET
+    );
+
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET
+    );
+
+    console.log(
+      "✅ Socket JWT decoded:",
+      decoded
     );
 
     socket.user = decoded;
 
     next();
   } catch (error) {
-    return next(
-      new Error("Invalid or expired token.")
+    console.error(
+      "❌ Socket JWT error:",
+      error.name,
+      error.message
+    );
+
+    next(
+      new Error(
+        `Socket authentication failed: ${error.message}`
+      )
     );
   }
 }

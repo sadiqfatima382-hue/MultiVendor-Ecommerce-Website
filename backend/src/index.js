@@ -8,7 +8,7 @@
 // app.listen(PORT, () => {
 //     console.log(`🚀 Server running on port ${PORT}`);
 // });
-
+import "dotenv/config";
 import http from "http";
 import app from "./app.js";
 import {initializeSocket,} from "./sockets/socket.js";
