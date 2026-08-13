@@ -96,3 +96,11 @@ export async function deleteVendor(id) {
     where: { id },
   });
 }
+
+export async function findVendorByUserId(userId) {
+  return prisma.vendor.findUnique({
+    where: {
+      userId,
+    },
+  });
+}
