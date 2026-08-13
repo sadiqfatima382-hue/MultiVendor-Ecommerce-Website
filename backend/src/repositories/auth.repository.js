@@ -74,3 +74,15 @@ export async function deleteUserRefreshTokens(userId) {
     },
   });
 }
+
+
+export async function findUserWithRole(userId) {
+  return prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      role: true,
+    },
+  });
+}
