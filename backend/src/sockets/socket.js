@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { socketAuth } from "./socket.auth.js";
+import { findVendorByUserId, } from "../repositories/vendor.repository.js";
 
 let io;
 
@@ -12,7 +13,7 @@ export function initializeSocket(server) {
 
   io.use(socketAuth);
 
-  io.on("connection", (socket) => {
+  io.on("connection", async(socket) => {
     console.log(
       `🔌 Socket connected: ${socket.id}`
     );
@@ -21,15 +22,21 @@ export function initializeSocket(server) {
       "Authenticated user:",
       socket.user
     );
-
+    //user room
     const userId = socket.user.userId;
+    socket.join(`user:${userId}`);
+    console.log(
+      `👤 User ${userId} joined room user:${userId}`
+    );
 
-socket.join(`user:${userId}`);
-
-console.log(
-  `👤 User ${userId} joined room user:${userId}`
-);
-
+    //vendor room
+    const vendor = await findVendorByUserId(userId);
+    if (vendor) {
+      socket.join(`vendor:${vendor.id}`);
+      console.log(
+        `🏪 Vendor ${vendor.id} joined room vendor:${vendor.id}`
+      );
+    }
     socket.on("disconnect", () => {
       console.log(
         `🔌 Socket disconnected: ${socket.id}`
