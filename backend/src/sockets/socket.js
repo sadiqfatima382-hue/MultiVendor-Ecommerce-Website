@@ -6,12 +6,10 @@ let io;
 export function initializeSocket(server) {
   io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL,
-      credentials: true,
+      origin: "*",
     },
   });
 
-  // JWT authentication
   io.use(socketAuth);
 
   io.on("connection", (socket) => {
@@ -23,8 +21,14 @@ export function initializeSocket(server) {
       "Authenticated user:",
       socket.user
     );
+
     const userId = socket.user.id;
+
     socket.join(`user:${userId}`);
+
+    console.log(
+      `👤 User ${userId} joined room user:${userId}`
+    );
 
     socket.on("disconnect", () => {
       console.log(
