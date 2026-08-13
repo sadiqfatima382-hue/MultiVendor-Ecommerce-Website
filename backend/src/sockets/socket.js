@@ -23,6 +23,8 @@ export function initializeSocket(server) {
       "Authenticated user:",
       socket.user
     );
+    const userId = socket.user.id;
+    socket.join(`user:${userId}`);
 
     socket.on("disconnect", () => {
       console.log(

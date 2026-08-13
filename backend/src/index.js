@@ -11,7 +11,7 @@
 
 import http from "http";
 import app from "./app.js";
-import {initializeSocket,} from "./sockets/sockets.js";
+import {initializeSocket,} from "./sockets/socket.js";
 
 const PORT = process.env.PORT || 5000;
 
