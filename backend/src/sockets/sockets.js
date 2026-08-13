@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { socketAuth } from "./socket.auth.js";
 
 let io;
 
@@ -10,14 +11,22 @@ export function initializeSocket(server) {
     },
   });
 
+  // JWT authentication
+  io.use(socketAuth);
+
   io.on("connection", (socket) => {
     console.log(
-      `🔌 Connected: ${socket.id}`
+      `🔌 Socket connected: ${socket.id}`
+    );
+
+    console.log(
+      "Authenticated user:",
+      socket.user
     );
 
     socket.on("disconnect", () => {
       console.log(
-        `🔌 Disconnected: ${socket.id}`
+        `🔌 Socket disconnected: ${socket.id}`
       );
     });
   });
