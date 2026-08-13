@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { socketAuth } from "./socket.auth.js";
 import { findVendorByUserId, } from "../repositories/vendor.repository.js";
+import { findUserWithRole,} from "../repositories/auth.repository.js";
 
 let io;
 
@@ -30,13 +31,23 @@ export function initializeSocket(server) {
     );
 
     //vendor room
-    const vendor = await findVendorByUserId(userId);
+    const vendor = await findVendorByUserId(ownerId);
     if (vendor) {
       socket.join(`vendor:${vendor.id}`);
       console.log(
         `🏪 Vendor ${vendor.id} joined room vendor:${vendor.id}`
       );
     }
+    //Admin room
+     const user = await findUserWithRole(userId);
+
+  if (user?.role?.name === "SUPER_ADMIN") {
+    socket.join("admin");
+
+    console.log(
+      `👑 Admin ${userId} joined room admin`
+    );
+  }
     socket.on("disconnect", () => {
       console.log(
         `🔌 Socket disconnected: ${socket.id}`
