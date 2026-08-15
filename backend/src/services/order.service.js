@@ -1,117 +1,305 @@
 import prisma from "../config/prisma.js";
-import { createOrder, createVendorOrder, createOrderItem, decrementVariantStock, clearCart, findOrderById, findOrdersByUser} from "../repositories/order.repository.js";
+import {  createOrder,  createVendorOrder,  createOrderItem,  decrementVariantStock,  clearCart,  findOrderById,  findOrdersByUser,} from "../repositories/order.repository.js";
 import { getCheckoutSummaryService } from "./checkout.service.js";
 import { findCheckoutCart } from "../repositories/checkout.repository.js";
+import { getIO } from "../sockets/socket.js";
+// ======================================================
+// CREATE ORDER
+// ======================================================
 
-export async function createOrderService(userId, paymentMethod, addressId) {
-    // Get validated checkout summary
-    const checkout = await getCheckoutSummaryService(userId, addressId);
+export async function createOrderService(
+  userId,
+  paymentMethod,
+  addressId
+) {
+  // Get validated checkout summary
+  const checkout =
+    await getCheckoutSummaryService(
+      userId,
+      addressId
+    );
 
-    // Get user's cart
-    const cart = await findCheckoutCart(userId);
+  // Get user's cart
+  const cart =
+    await findCheckoutCart(userId);
 
-    if (!cart || cart.items.length === 0) {
-        throw new Error("Cart is empty.");
-    }
+  if (!cart || cart.items.length === 0) {
+    throw new Error("Cart is empty.");
+  }
 
-    // Start transaction
-    return prisma.$transaction(async (tx) => {
-        // Create main order
-        const order = await createOrder(tx, {
-            userId,
-            addressId: checkout.address.id,
+  // ====================================================
+  // DATABASE TRANSACTION
+  // ====================================================
 
-            subtotal: checkout.summary.subtotal,
-            shipping: checkout.summary.shipping,
-            discount: checkout.summary.discount,
-            tax: checkout.summary.tax,
-            grandTotal: checkout.summary.grandTotal,
+  const result = await prisma.$transaction(
+    async (tx) => {
 
-            paymentMethod,
-            paymentStatus: "PENDING",
-            status: "PENDING",
-        });
+      // ----------------------------------------------
+      // Create main order
+      // ----------------------------------------------
 
-        // Create vendor orders
-        for (const vendorData of checkout.vendors) {
-            const vendorOrder = await createVendorOrder(tx, {
-                orderId: order.id,
-                vendorId: vendorData.vendor.id,
+      const order = await createOrder(tx, {
+        userId,
 
-                subtotal: vendorData.subtotal,
+        addressId:
+          checkout.address.id,
 
-                status: "PENDING",
-            });
+        subtotal:
+          checkout.summary.subtotal,
 
-            // Create order items
-            for (const item of vendorData.items) {
-                await createOrderItem(tx, {
-                    vendorOrderId: vendorOrder.id,
+        shipping:
+          checkout.summary.shipping,
 
-                    productId: item.productVariant.product.id,
-                    productVariantId: item.productVariant.id,
+        discount:
+          checkout.summary.discount,
 
-                    productName: item.productVariant.product.name,
-                    productSku: item.productVariant.sku,
+        tax:
+          checkout.summary.tax,
 
-                    quantity: item.quantity,
-                    price: item.productVariant.price,
+        grandTotal:
+          checkout.summary.grandTotal,
 
-                    total:
-                        Number(item.productVariant.price) *
-                        item.quantity,
-                });
+        paymentMethod,
 
-                // Reduce stock
-                await decrementVariantStock(
-                    tx,
-                    item.productVariant.id,
-                    item.quantity
-                ); {
-                    const stockUpdated = await decrementVariantStock(
-                        tx,
-                        item.productVariant.id,
-                        item.quantity
-                    );
+        paymentStatus: "PENDING",
 
-                    if (stockUpdated.count === 0) {
-                        throw new Error(
-                            `${item.productVariant.product.name} no longer has sufficient stock. Please review your cart and try again.`
-                        );
-                    }
-                }
-            }
-        }
+        status: "PENDING",
+      });
 
-        // Clear customer's cart
-        await clearCart(tx, cart.id);
 
-        // Return response
-        return {
+      // ----------------------------------------------
+      // Create vendor orders
+      // ----------------------------------------------
+
+      for (const vendorData of checkout.vendors) {
+
+        const vendorOrder =
+          await createVendorOrder(tx, {
+
             orderId: order.id,
-            message: "Order placed successfully.",
-        };
-    });
+
+            vendorId:
+              vendorData.vendor.id,
+
+            subtotal:
+              vendorData.subtotal,
+
+            status: "PENDING",
+          });
+
+
+        // --------------------------------------------
+        // Create order items
+        // --------------------------------------------
+
+        for (const item of vendorData.items) {
+
+          await createOrderItem(tx, {
+
+            vendorOrderId:
+              vendorOrder.id,
+
+            productId:
+              item.productVariant.product.id,
+
+            productVariantId:
+              item.productVariant.id,
+
+            productName:
+              item.productVariant.product.name,
+
+            productSku:
+              item.productVariant.sku,
+
+            quantity:
+              item.quantity,
+
+            price:
+              item.productVariant.price,
+
+            total:
+              Number(
+                item.productVariant.price
+              ) * item.quantity,
+          });
+
+
+          // ------------------------------------------
+          // Reduce stock
+          // ------------------------------------------
+
+          const stockUpdated =
+            await decrementVariantStock(
+              tx,
+              item.productVariant.id,
+              item.quantity
+            );
+
+
+          // ------------------------------------------
+          // Check stock
+          // ------------------------------------------
+
+          if (stockUpdated.count === 0) {
+
+            throw new Error(
+              `${item.productVariant.product.name} no longer has sufficient stock. Please review your cart and try again.`
+            );
+          }
+        }
+      }
+
+
+      // ----------------------------------------------
+      // Clear customer's cart
+      // ----------------------------------------------
+
+      await clearCart(
+        tx,
+        cart.id
+      );
+
+
+      // ----------------------------------------------
+      // Return transaction result
+      // ----------------------------------------------
+
+      return {
+        orderId: order.id,
+
+        vendors:
+          checkout.vendors,
+
+        message:
+          "Order placed successfully.",
+      };
+    }
+  );
+
+
+  // ==================================================
+  // SOCKET.IO EVENTS
+  // ==================================================
+  const io = getIO();
+
+
+  // ==================================================
+  // CUSTOMER EVENT
+  // ==================================================
+
+  io.to(`user:${userId}`).emit(
+    "order:created",
+    {
+      orderId:
+        result.orderId,
+
+      message:
+        "Your order has been placed successfully.",
+    }
+  );
+
+
+  // ==================================================
+  // ADMIN EVENT
+  // ==================================================
+
+  io.to("admin").emit(
+    "order:new",
+    {
+      orderId:
+        result.orderId,
+
+      customerId:
+        userId,
+
+      message:
+        "A new order has been placed.",
+    }
+  );
+
+
+  // ==================================================
+  // VENDOR EVENTS
+  // ==================================================
+
+  for (
+    const vendorData
+    of result.vendors
+  ) {
+
+    io.to(
+      `vendor:${vendorData.vendor.id}`
+    ).emit(
+      "vendor:order:new",
+      {
+        orderId:
+          result.orderId,
+
+        vendorId:
+          vendorData.vendor.id,
+
+        message:
+          "You have received a new order.",
+      }
+    );
+  }
+
+
+  // ==================================================
+  // RETURN RESPONSE
+  // ==================================================
+
+  return {
+    orderId:
+      result.orderId,
+
+    message:
+      result.message,
+  };
 }
-    export async function getOrdersService(userId) {
-  return await findOrdersByUser(userId);
+
+
+// ======================================================
+// GET USER ORDERS
+// ======================================================
+
+export async function getOrdersService(
+  userId
+) {
+  return await findOrdersByUser(
+    userId
+  );
 }
+
+
+// ======================================================
+// GET ORDER BY ID
+// ======================================================
 
 export async function getOrderByIdService(
   userId,
   orderId
 ) {
-  const order = await findOrderById(orderId);
+  const order =
+    await findOrderById(orderId);
+
 
   if (!order) {
-    throw new Error("Order not found.");
+    throw new Error(
+      "Order not found."
+    );
   }
 
-  if (order.userId !== userId) {
+
+  // Ownership check
+  if (
+    order.userId !== userId
+  ) {
     throw new Error(
       "You are not authorized to access this order."
     );
   }
+
 
   return order;
 }
