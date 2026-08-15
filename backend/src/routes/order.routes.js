@@ -1,5 +1,5 @@
 import express from "express";
-import { createOrder, getOrders, getOrderById, } from "../controllers/order.controller.js";
+import { createOrder, getOrders, getOrderById, updateOrderStatus } from "../controllers/order.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { createOrderSchema } from "../validators/vendor/order.validation.js";
@@ -14,4 +14,5 @@ router.get("/", getOrders);
 
 router.get("/:id", getOrderById);
 
+router.patch("/:orderId/status", authMiddleware, updateOrderStatus);
 export default router;
