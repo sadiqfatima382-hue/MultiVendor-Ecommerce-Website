@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { io } from "socket.io-client";
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbXJieGNyZXQwMDJqbWd2cmo4NmxpMTR5Iiwicm9sZUlkIjoiY21yYnhjcjByMDAwMG1ndnJ6ajRnYW5vZyIsImlhdCI6MTc4Njc3ODc5OCwiZXhwIjoxNzg2Nzc5Njk4fQ.2MjBYOo1z5iy9DeD7eHJMFU6M73gz6uj4yJWhe6dtkQ";
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbXJjMWVndGMwMDAwcTR2cmF2emFwbDFjIiwicm9sZUlkIjoiY21yYnhjcjFpMDAwNG1ndnJ3aHVhYjdzZyIsImlhdCI6MTc4Njc4NjMzMiwiZXhwIjoxNzg2Nzg3MjMyfQ.U3N2KYWZuq83Ze2Gx5ypiQTk7K30QY1eNFehc7jk2Kw";
 
 const socket = io("http://localhost:5000", {
   auth: {
@@ -11,7 +11,41 @@ const socket = io("http://localhost:5000", {
 
 socket.on("connect", () => {
   console.log("✅ Socket connected:", socket.id);
+
+  const orderId = "cms35flbd00012wvrxrxfnmax"
+
+  socket.emit(
+    "join:order",
+    orderId,
+    (response) => {
+      console.log(
+        "📦 Join order response:",
+        response
+      );
+    }
+  );
+  });
+  socket.on("order:created", (data) => {
+  console.log(
+    "🛒 Customer order event:",
+    data
+  );
 });
+
+socket.on("order:new", (data) => {
+  console.log(
+    "👑 Admin new order event:",
+    data
+  );
+});
+
+socket.on("vendor:order:new", (data) => {
+  console.log(
+    "🏪 Vendor new order event:",
+    data
+  );
+});
+
 
 socket.on("connect_error", (error) => {
   console.error(
