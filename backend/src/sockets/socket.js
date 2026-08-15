@@ -12,6 +12,7 @@ export function initializeSocket(server) {
       origin: "*",
     },
   });
+  
 
   io.use(socketAuth);
 
