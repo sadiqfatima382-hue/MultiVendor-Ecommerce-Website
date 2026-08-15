@@ -14,5 +14,5 @@ router.get("/", getOrders);
 
 router.get("/:id", getOrderById);
 
-router.patch("/:orderId/status", authMiddleware, updateOrderStatus);
+router.patch("/:orderId/status", authenticate, updateOrderStatus);
 export default router;

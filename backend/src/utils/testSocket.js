@@ -14,7 +14,7 @@
 
 //   const orderId = "cms35flbd00012wvrxrxfnmax"
 
-  
+
 //   socket.emit(
 //     "join:order",
 //     orderId,
@@ -86,6 +86,16 @@ const socket = io("http://localhost:5000", {
 socket.on("connect", () => {
   console.log("✅ Socket connected:", socket.id);
 
+
+  notifyUser(
+  "cmrc1egtc0000q4vravzapl1c",
+  {
+    type: "TEST",
+    title: "Test Notification",
+    message: "Socket notification is working.",
+  }
+);
+
   const orderId = "cms35flbd00012wvrxrxfnmax";
 
   socket.emit("join:order", orderId, (response) => {
@@ -97,6 +107,10 @@ socket.on("order:status-updated", (data) => {
   console.log("⚡ Order status updated:", data);
 });
 
+
+socket.on("notification", (data) => {
+  console.log("🔔 Notification received:", data);
+});
 socket.on("order:created", (data) => {
   console.log("🛒 Customer order event:", data);
 });
