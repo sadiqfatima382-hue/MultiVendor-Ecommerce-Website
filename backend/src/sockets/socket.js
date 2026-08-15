@@ -31,7 +31,7 @@ export function initializeSocket(server) {
     );
 
     //vendor room
-    const vendor = await findVendorByUserId(ownerId);
+    const vendor = await findVendorByUserId(userId);
     if (vendor) {
       socket.join(`vendor:${vendor.id}`);
       console.log(

@@ -100,7 +100,7 @@ export async function deleteVendor(id) {
 export async function findVendorByUserId(userId) {
   return prisma.vendor.findUnique({
     where: {
-      userId,
+      ownerId: userId,
     },
   });
 }
