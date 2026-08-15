@@ -1,8 +1,23 @@
 import prisma from "../config/prisma.js";
-import {  createOrder,  createVendorOrder,  createOrderItem,  decrementVariantStock,  clearCart,  findOrderById,  findOrdersByUser,} from "../repositories/order.repository.js";
+
+import {
+  createOrder,
+  createVendorOrder,
+  createOrderItem,
+  decrementVariantStock,
+  clearCart,
+  findOrderById,
+  findOrdersByUser,
+  updateOrder,
+} from "../repositories/order.repository.js";
+
 import { getCheckoutSummaryService } from "./checkout.service.js";
+
 import { findCheckoutCart } from "../repositories/checkout.repository.js";
+
 import { getIO } from "../sockets/socket.js";
+
+
 // ======================================================
 // CREATE ORDER
 // ======================================================
@@ -76,7 +91,8 @@ export async function createOrderService(
         const vendorOrder =
           await createVendorOrder(tx, {
 
-            orderId: order.id,
+            orderId:
+              order.id,
 
             vendorId:
               vendorData.vendor.id,
@@ -84,7 +100,8 @@ export async function createOrderService(
             subtotal:
               vendorData.subtotal,
 
-            status: "PENDING",
+            status:
+              "PENDING",
           });
 
 
@@ -165,7 +182,8 @@ export async function createOrderService(
       // ----------------------------------------------
 
       return {
-        orderId: order.id,
+        orderId:
+          order.id,
 
         vendors:
           checkout.vendors,
@@ -180,6 +198,7 @@ export async function createOrderService(
   // ==================================================
   // SOCKET.IO EVENTS
   // ==================================================
+
   const io = getIO();
 
 
@@ -291,7 +310,6 @@ export async function getOrderByIdService(
   }
 
 
-  // Ownership check
   if (
     order.userId !== userId
   ) {
@@ -302,4 +320,130 @@ export async function getOrderByIdService(
 
 
   return order;
+}
+
+
+// ======================================================
+// UPDATE ORDER STATUS
+// ======================================================
+
+export async function updateOrderStatusService(
+  orderId,
+  status
+) {
+  // ----------------------------------------------
+  // Find order
+  // ----------------------------------------------
+
+  const order =
+    await findOrderById(orderId);
+
+
+  if (!order) {
+    throw new Error(
+      "Order not found."
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Update database FIRST
+  // ----------------------------------------------
+
+  const updatedOrder =
+    await updateOrder(
+      orderId,
+      {
+        status,
+      }
+    );
+
+
+  // ----------------------------------------------
+  // Socket.IO
+  // ----------------------------------------------
+
+  const io = getIO();
+
+
+  // ----------------------------------------------
+  // Notify everyone inside order room
+  // ----------------------------------------------
+
+  io.to(`order:${orderId}`).emit(
+    "order:status-updated",
+    {
+      orderId:
+        updatedOrder.id,
+
+      orderNumber:
+        updatedOrder.orderNumber,
+
+      status:
+        updatedOrder.status,
+
+      paymentStatus:
+        updatedOrder.paymentStatus,
+
+      updatedAt:
+        updatedOrder.updatedAt,
+    }
+  );
+
+
+  // ----------------------------------------------
+  // Notify customer
+  // ----------------------------------------------
+
+  io.to(`user:${order.userId}`).emit(
+    "order:status-updated",
+    {
+      orderId:
+        updatedOrder.id,
+
+      orderNumber:
+        updatedOrder.orderNumber,
+
+      status:
+        updatedOrder.status,
+
+      paymentStatus:
+        updatedOrder.paymentStatus,
+
+      updatedAt:
+        updatedOrder.updatedAt,
+    }
+  );
+
+
+  // ----------------------------------------------
+  // Notify admin
+  // ----------------------------------------------
+
+  io.to("admin").emit(
+    "order:status-updated",
+    {
+      orderId:
+        updatedOrder.id,
+
+      orderNumber:
+        updatedOrder.orderNumber,
+
+      status:
+        updatedOrder.status,
+
+      paymentStatus:
+        updatedOrder.paymentStatus,
+
+      updatedAt:
+        updatedOrder.updatedAt,
+    }
+  );
+
+
+  // ----------------------------------------------
+  // Return updated order
+  // ----------------------------------------------
+
+  return updatedOrder;
 }
