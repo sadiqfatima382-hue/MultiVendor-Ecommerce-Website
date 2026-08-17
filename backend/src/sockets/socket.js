@@ -1,12 +1,14 @@
 import prisma from "../config/prisma.js";
 import { Server } from "socket.io";
 import { socketAuth } from "./socket.auth.js";
-import { findVendorByUserId, } from "../repositories/vendor.repository.js";
-import { findUserWithRole, } from "../repositories/auth.repository.js";
-import {notifyUser} from "../utils/socketNotification.js"
+import { findVendorByUserId } from "../repositories/vendor.repository.js";
+import { findUserWithRole } from "../repositories/auth.repository.js";
+import { notifyUser } from "../utils/socketNotification.js";
+import { initializeSocketRedis } from "../config/socket.redis.js";
+
 let io;
 
-export function initializeSocket(server) {
+export async function initializeSocket(server) {
   io = new Server(server, {
     cors: {
       origin: process.env.FRONTEND_URL,
@@ -15,43 +17,45 @@ export function initializeSocket(server) {
   });
 
   io.use(socketAuth);
-}
 
-export function initializeSocket(server) {
-  io = new Server(server, {
-    cors: {
-      origin: "*",
-    },
-  });
-  
-
-  io.use(socketAuth);
+  // Redis adapter
+  await initializeSocketRedis(io);
 
   io.on("connection", async (socket) => {
-    console.log(
-      `🔌 Socket connected: ${socket.id}`
-    );
+    console.log(`🔌 Socket connected: ${socket.id}`);
 
-    console.log(
-      "Authenticated user:",
-      socket.user
-    );
-    //user room
+    console.log("Authenticated user:", socket.user);
+
+    // =========================
+    // USER ROOM
+    // =========================
+
     const userId = socket.user.userId;
+
     socket.join(`user:${userId}`);
+
     console.log(
       `👤 User ${userId} joined room user:${userId}`
     );
 
-    //vendor room
+    // =========================
+    // VENDOR ROOM
+    // =========================
+
     const vendor = await findVendorByUserId(userId);
+
     if (vendor) {
       socket.join(`vendor:${vendor.id}`);
+
       console.log(
         `🏪 Vendor ${vendor.id} joined room vendor:${vendor.id}`
       );
     }
-    //Admin room
+
+    // =========================
+    // ADMIN ROOM
+    // =========================
+
     const user = await findUserWithRole(userId);
 
     if (user?.role?.name === "SUPER_ADMIN") {
@@ -62,6 +66,10 @@ export function initializeSocket(server) {
       );
     }
 
+    // =========================
+    // JOIN ORDER ROOM
+    // =========================
+
     socket.on("join:order", async (orderId, callback) => {
       try {
         if (!orderId) {
@@ -71,9 +79,6 @@ export function initializeSocket(server) {
           });
         }
 
-        const userId = socket.user.userId;
-
-        // Find the order
         const order = await prisma.order.findUnique({
           where: {
             id: orderId,
@@ -90,7 +95,7 @@ export function initializeSocket(server) {
           });
         }
 
-        // Check customer ownership
+        // Customer
         if (order.userId === userId) {
           socket.join(`order:${orderId}`);
 
@@ -104,10 +109,8 @@ export function initializeSocket(server) {
           });
         }
 
-        // Check admin access
-        const user = await findUserWithRole(userId);
-
-        if (user?.role?.name === "ADMIN") {
+        // Admin
+        if (user?.role?.name === "SUPER_ADMIN") {
           socket.join(`order:${orderId}`);
 
           console.log(
@@ -120,9 +123,7 @@ export function initializeSocket(server) {
           });
         }
 
-        // Check vendor access
-        const vendor = await findVendorByUserId(userId);
-
+        // Vendor
         if (vendor) {
           const ownsOrder = order.vendorOrders.some(
             (vendorOrder) =>
@@ -148,6 +149,7 @@ export function initializeSocket(server) {
           message:
             "You are not authorized to join this order room.",
         });
+
       } catch (error) {
         console.error(
           "❌ Join order room error:",
@@ -161,24 +163,21 @@ export function initializeSocket(server) {
       }
     });
 
-    io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
+    // =========================
+    // TEST NOTIFICATION
+    // =========================
 
-  const userId = socket.user.userId;
-
-  socket.join(`user:${userId}`);
-
-  setTimeout(() => {
-    notifyUser(
-      userId,
-      {
+    setTimeout(() => {
+      notifyUser(userId, {
         type: "TEST",
         title: "Test Notification",
         message: "Socket notification is working!",
-      }
-    );
-  }, 2000);
-});
+      });
+    }, 2000);
+
+    // =========================
+    // DISCONNECT
+    // =========================
 
     socket.on("disconnect", () => {
       console.log(
