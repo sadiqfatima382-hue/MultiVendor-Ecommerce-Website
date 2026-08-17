@@ -1,8 +1,7 @@
 import "dotenv/config";
 import { io } from "socket.io-client";
 
-
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbXJjMWVndGMwMDAwcTR2cmF2emFwbDFjIiwicm9sZUlkIjoiY21yYnhjcjFpMDAwNG1ndnJ3aHVhYjdzZyIsImlhdCI6MTc4Njc5MTc4OCwiZXhwIjoxNzg2NzkyNjg4fQ.BhZvUCoVCJN6-1aW7SQJdEdLmDlCQx2lDUGsVlz1uGY"
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbXJjMWVndGMwMDAwcTR2cmF2emFwbDFjIiwicm9sZUlkIjoiY21yYnhjcjFpMDAwNG1ndnJ3aHVhYjdzZyIsImlhdCI6MTc4Njk1MjY1MSwiZXhwIjoxNzg2OTUzNTUxfQ.rpRA4jUjIg2xtFt4M6mrWLD0mLPTG5oR_FpjvaOTvoY"
 
 const socket = io("http://localhost:5000", {
   auth: {

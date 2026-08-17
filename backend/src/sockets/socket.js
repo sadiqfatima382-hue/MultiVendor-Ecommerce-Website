@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 import { socketAuth } from "./socket.auth.js";
 import { findVendorByUserId, } from "../repositories/vendor.repository.js";
 import { findUserWithRole, } from "../repositories/auth.repository.js";
-
+import {notifyUser} from "../utils/socketNotification.js"
 let io;
 
 export function initializeSocket(server) {
@@ -150,6 +150,24 @@ export function initializeSocket(server) {
       }
     });
 
+    io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  const userId = socket.user.userId;
+
+  socket.join(`user:${userId}`);
+
+  setTimeout(() => {
+    notifyUser(
+      userId,
+      {
+        type: "TEST",
+        title: "Test Notification",
+        message: "Socket notification is working!",
+      }
+    );
+  }, 2000);
+});
 
     socket.on("disconnect", () => {
       console.log(
