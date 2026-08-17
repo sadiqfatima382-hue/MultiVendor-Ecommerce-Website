@@ -1,22 +1,55 @@
+// import "dotenv/config";
+
+// import { addEmailJob } from "../queues/email.queue.js";
+
+// const job = await addEmailJob({
+//   to: process.env.SMTP_USER,
+
+//   type: "ORDER_CONFIRMATION",
+
+//   data: {
+//     name: "Test Customer",
+//     orderNumber: "TEST-1001",
+//     grandTotal: "5000",
+//   },
+// });
+
+// console.log(
+//   "✅ Email job added:",
+//   job.id
+// );
+
+// process.exit(0);
+
 import "dotenv/config";
 
-import { addEmailJob } from "../queues/email.queue.js";
+import emailQueue from "../queues/email.queue.js";
 
-const job = await addEmailJob({
-  to: process.env.SMTP_USER,
+const job =
+  await emailQueue.add(
+    "send-test-email",
+    {
+      to: process.env.TEST_EMAIL,
 
-  type: "ORDER_CONFIRMATION",
+      subject:
+        "BullMQ Test Email",
 
-  data: {
-    name: "Test Customer",
-    orderNumber: "TEST-1001",
-    grandTotal: "5000",
-  },
-});
+      text:
+        "BullMQ + Redis + Nodemailer are working successfully!",
+
+      html: `
+        <h2>BullMQ Test</h2>
+        <p>
+          BullMQ, Redis and Nodemailer
+          are working successfully! 🚀
+        </p>
+      `,
+    }
+  );
 
 console.log(
-  "✅ Email job added:",
+  "📨 Email job added:",
   job.id
 );
 
-process.exit(0);
+await emailQueue.close();
