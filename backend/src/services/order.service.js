@@ -1,9 +1,10 @@
 import prisma from "../config/prisma.js";
-import {  createOrder,  createVendorOrder,  createOrderItem,  decrementVariantStock,  clearCart,  findOrderById,  findOrdersByUser,  updateOrder,} from "../repositories/order.repository.js";
+import { createOrder, createVendorOrder, createOrderItem, decrementVariantStock, clearCart, findOrderById, findOrdersByUser, updateOrder, } from "../repositories/order.repository.js";
 import { getCheckoutSummaryService } from "./checkout.service.js";
 import { findCheckoutCart } from "../repositories/checkout.repository.js";
 import { getIO } from "../sockets/socket.js";
-
+import { notifyUser, notifyVendor, notifyAdmin } from "../utils/socketNotification.js";
+import { types } from "pg";
 // ======================================================
 // CREATE ORDER
 // ======================================================
@@ -180,6 +181,30 @@ export async function createOrderService(
     }
   );
 
+  notifyUser(userId,{
+    type:"ORDER_CREATED",
+    title:"Order Placed",
+    message:"Your order has been placed successfully",
+    orderId:result.orderId
+  })
+
+  notifyAdmin({
+    type:"NEW_ORDER",
+    title:"New Order",
+    message:"A New Order has been placed",
+    orderId:result.orderId,
+    customerId:userId,
+  })
+
+  for(const vendorData of result.vendors){
+    notifyVendor(vendorData.vendor.id,{
+      type:"NEW_ORDER",
+      title:"New Order",
+      message:"you have received a new order",
+      orderId:result.orderId,
+      vendorId:vendorData.vendor.id,    
+    })
+  }
 
   // ==================================================
   // SOCKET.IO EVENTS
@@ -375,6 +400,22 @@ export async function updateOrderStatusService(
         updatedOrder.updatedAt,
     }
   );
+
+  notifyUser(order.userId, {
+  type: "ORDER_STATUS_UPDATED",
+  title: "Order Status Updated",
+  message: `Your order is now ${updatedOrder.status}.`,
+  orderId: updatedOrder.id,
+  status: updatedOrder.status,
+});
+
+notifyAdmin({
+  type: "ORDER_STATUS_UPDATED",
+  title: "Order Status Updated",
+  message: `Order ${updatedOrder.orderNumber ?? updatedOrder.id} is now ${updatedOrder.status}.`,
+  orderId: updatedOrder.id,
+  status: updatedOrder.status,
+});
 
 
   // ----------------------------------------------
