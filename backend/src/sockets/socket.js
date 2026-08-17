@@ -9,6 +9,17 @@ let io;
 export function initializeSocket(server) {
   io = new Server(server, {
     cors: {
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+    },
+  });
+
+  io.use(socketAuth);
+}
+
+export function initializeSocket(server) {
+  io = new Server(server, {
+    cors: {
       origin: "*",
     },
   });
