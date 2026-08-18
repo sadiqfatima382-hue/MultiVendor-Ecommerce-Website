@@ -4,7 +4,7 @@ import { connection } from "../config/queue.js";
 import {  sendOtpEmail,  sendPasswordResetEmail,  sendOrderConfirmationEmail,} from "../utils/mailer.js";
 
 const worker = new Worker(
-  "email",
+  "email-queue",
   async (job) => {
     const {
       to,

@@ -16,14 +16,20 @@ export async function createOrderService(
   paymentMethod,
   addressId
 ) {
-  // Get validated checkout summary
+  // ==================================================
+  // GET CHECKOUT SUMMARY
+  // ==================================================
+
   const checkout =
     await getCheckoutSummaryService(
       userId,
       addressId
     );
 
-  // Get user's cart
+  // ==================================================
+  // GET USER CART
+  // ==================================================
+
   const cart =
     await findCheckoutCart(userId);
 
@@ -31,55 +37,59 @@ export async function createOrderService(
     throw new Error("Cart is empty.");
   }
 
-  // ====================================================
+  // ==================================================
   // DATABASE TRANSACTION
-  // ====================================================
+  // ==================================================
 
   const result = await prisma.$transaction(
     async (tx) => {
 
       // ----------------------------------------------
-      // Create main order
+      // CREATE MAIN ORDER
       // ----------------------------------------------
 
-      const order = await createOrder(tx, {
-        userId,
+      const order =
+        await createOrder(tx, {
+          userId,
 
-        addressId:
-          checkout.address.id,
+          addressId:
+            checkout.address.id,
 
-        subtotal:
-          checkout.summary.subtotal,
+          subtotal:
+            checkout.summary.subtotal,
 
-        shipping:
-          checkout.summary.shipping,
+          shipping:
+            checkout.summary.shipping,
 
-        discount:
-          checkout.summary.discount,
+          discount:
+            checkout.summary.discount,
 
-        tax:
-          checkout.summary.tax,
+          tax:
+            checkout.summary.tax,
 
-        grandTotal:
-          checkout.summary.grandTotal,
+          grandTotal:
+            checkout.summary.grandTotal,
 
-        paymentMethod,
+          paymentMethod,
 
-        paymentStatus: "PENDING",
+          paymentStatus:
+            "PENDING",
 
-        status: "PENDING",
-      });
-
+          status:
+            "PENDING",
+        });
 
       // ----------------------------------------------
-      // Create vendor orders
+      // CREATE VENDOR ORDERS
       // ----------------------------------------------
 
-      for (const vendorData of checkout.vendors) {
+      for (
+        const vendorData
+        of checkout.vendors
+      ) {
 
         const vendorOrder =
           await createVendorOrder(tx, {
-
             orderId:
               order.id,
 
@@ -93,15 +103,16 @@ export async function createOrderService(
               "PENDING",
           });
 
-
         // --------------------------------------------
-        // Create order items
+        // CREATE ORDER ITEMS
         // --------------------------------------------
 
-        for (const item of vendorData.items) {
+        for (
+          const item
+          of vendorData.items
+        ) {
 
           await createOrderItem(tx, {
-
             vendorOrderId:
               vendorOrder.id,
 
@@ -129,9 +140,8 @@ export async function createOrderService(
               ) * item.quantity,
           });
 
-
           // ------------------------------------------
-          // Reduce stock
+          // DECREMENT STOCK
           // ------------------------------------------
 
           const stockUpdated =
@@ -141,13 +151,13 @@ export async function createOrderService(
               item.quantity
             );
 
-
           // ------------------------------------------
-          // Check stock
+          // CHECK STOCK
           // ------------------------------------------
 
-          if (stockUpdated.count === 0) {
-
+          if (
+            stockUpdated.count === 0
+          ) {
             throw new Error(
               `${item.productVariant.product.name} no longer has sufficient stock. Please review your cart and try again.`
             );
@@ -155,9 +165,8 @@ export async function createOrderService(
         }
       }
 
-
       // ----------------------------------------------
-      // Clear customer's cart
+      // CLEAR CART
       // ----------------------------------------------
 
       await clearCart(
@@ -165,13 +174,13 @@ export async function createOrderService(
         cart.id
       );
 
-
       // ----------------------------------------------
-      // Return transaction result
+      // RETURN TRANSACTION RESULT
       // ----------------------------------------------
 
       return {
-        orderId: order.id,
+        orderId:
+          order.id,
 
         orderNumber:
           order.orderNumber,
@@ -179,38 +188,14 @@ export async function createOrderService(
         grandTotal:
           order.grandTotal,
 
-        vendors: checkout.vendors,
+        vendors:
+          checkout.vendors,
 
         message:
           "Order placed successfully.",
       };
     }
   );
-
-  notifyUser(userId, {
-    type: "ORDER_CREATED",
-    title: "Order Placed",
-    message: "Your order has been placed successfully",
-    orderId: result.orderId
-  })
-
-  notifyAdmin({
-    type: "NEW_ORDER",
-    title: "New Order",
-    message: "A New Order has been placed",
-    orderId: result.orderId,
-    customerId: userId,
-  })
-
-  for (const vendorData of result.vendors) {
-    notifyVendor(vendorData.vendor.id, {
-      type: "NEW_ORDER",
-      title: "New Order",
-      message: "you have received a new order",
-      orderId: result.orderId,
-      vendorId: vendorData.vendor.id,
-    })
-  }
 
   // ==================================================
   // CUSTOMER EMAIL
@@ -228,13 +213,11 @@ export async function createOrderService(
       },
     });
 
-
   if (!customer) {
     throw new Error(
       "Customer not found."
     );
   }
-
 
   const email =
     orderPlacedEmail({
@@ -251,9 +234,9 @@ export async function createOrderService(
         result.grandTotal,
     });
 
-
   await queueEmail({
-    to: customer.email,
+    to:
+      customer.email,
 
     subject:
       email.subject,
@@ -266,15 +249,78 @@ export async function createOrderService(
   });
 
   // ==================================================
+  // SOCKET NOTIFICATIONS
+  // ==================================================
+
+  // Customer notification
+  notifyUser(userId, {
+    type:
+      "ORDER_CREATED",
+
+    title:
+      "Order Placed",
+
+    message:
+      "Your order has been placed successfully.",
+
+    orderId:
+      result.orderId,
+  });
+
+  // Admin notification
+  notifyAdmin({
+    type:
+      "NEW_ORDER",
+
+    title:
+      "New Order",
+
+    message:
+      "A new order has been placed.",
+
+    orderId:
+      result.orderId,
+
+    customerId:
+      userId,
+  });
+
+  // Vendor notifications
+  for (
+    const vendorData
+    of result.vendors
+  ) {
+
+    notifyVendor(
+      vendorData.vendor.id,
+      {
+        type:
+          "NEW_ORDER",
+
+        title:
+          "New Order",
+
+        message:
+          "You have received a new order.",
+
+        orderId:
+          result.orderId,
+
+        vendorId:
+          vendorData.vendor.id,
+      }
+    );
+  }
+
+  // ==================================================
   // SOCKET.IO EVENTS
   // ==================================================
 
   const io = getIO();
 
-
-  // ==================================================
+  // ----------------------------------------------
   // CUSTOMER EVENT
-  // ==================================================
+  // ----------------------------------------------
 
   io.to(`user:${userId}`).emit(
     "order:created",
@@ -287,10 +333,9 @@ export async function createOrderService(
     }
   );
 
-
-  // ==================================================
+  // ----------------------------------------------
   // ADMIN EVENT
-  // ==================================================
+  // ----------------------------------------------
 
   io.to("admin").emit(
     "order:new",
@@ -306,10 +351,9 @@ export async function createOrderService(
     }
   );
 
-
-  // ==================================================
+  // ----------------------------------------------
   // VENDOR EVENTS
-  // ==================================================
+  // ----------------------------------------------
 
   for (
     const vendorData
@@ -332,7 +376,6 @@ export async function createOrderService(
       }
     );
   }
-
 
   // ==================================================
   // RETURN RESPONSE
