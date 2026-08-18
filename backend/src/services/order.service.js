@@ -235,18 +235,16 @@ export async function createOrderService(
     });
 
   await queueEmail({
-    to:
-      customer.email,
+  type: "ORDER_PLACED",
 
-    subject:
-      email.subject,
+  to: customer.email,
 
-    text:
-      email.text,
+  subject: email.subject,
 
-    html:
-      email.html,
-  });
+  text: email.text,
+
+  html: email.html,
+});
 
   // ==================================================
   // SOCKET NOTIFICATIONS

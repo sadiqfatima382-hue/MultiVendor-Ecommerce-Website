@@ -1,6 +1,7 @@
 import emailQueue from "./email.queue.js"; 
  
 export async function queueEmail({ 
+  type,
   to, 
   subject, 
   text, 
@@ -9,6 +10,7 @@ export async function queueEmail({
   return emailQueue.add( 
     "send-email", 
     { 
+      type,
       to, 
       subject, 
       text, 
