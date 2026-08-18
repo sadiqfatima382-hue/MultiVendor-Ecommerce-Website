@@ -5,6 +5,8 @@ import { findCheckoutCart } from "../repositories/checkout.repository.js";
 import { getIO } from "../sockets/socket.js";
 import { notifyUser, notifyVendor, notifyAdmin } from "../utils/socketNotification.js";
 import { types } from "pg";
+import { queueEmail } from "../queues/email.job.js";
+import { orderPlacedEmail, } from "../email/order.email.js";
 // ======================================================
 // CREATE ORDER
 // ======================================================
@@ -169,11 +171,15 @@ export async function createOrderService(
       // ----------------------------------------------
 
       return {
-        orderId:
-          order.id,
+        orderId: order.id,
 
-        vendors:
-          checkout.vendors,
+        orderNumber:
+          order.orderNumber,
+
+        grandTotal:
+          order.grandTotal,
+
+        vendors: checkout.vendors,
 
         message:
           "Order placed successfully.",
@@ -181,30 +187,83 @@ export async function createOrderService(
     }
   );
 
-  notifyUser(userId,{
-    type:"ORDER_CREATED",
-    title:"Order Placed",
-    message:"Your order has been placed successfully",
-    orderId:result.orderId
+  notifyUser(userId, {
+    type: "ORDER_CREATED",
+    title: "Order Placed",
+    message: "Your order has been placed successfully",
+    orderId: result.orderId
   })
 
   notifyAdmin({
-    type:"NEW_ORDER",
-    title:"New Order",
-    message:"A New Order has been placed",
-    orderId:result.orderId,
-    customerId:userId,
+    type: "NEW_ORDER",
+    title: "New Order",
+    message: "A New Order has been placed",
+    orderId: result.orderId,
+    customerId: userId,
   })
 
-  for(const vendorData of result.vendors){
-    notifyVendor(vendorData.vendor.id,{
-      type:"NEW_ORDER",
-      title:"New Order",
-      message:"you have received a new order",
-      orderId:result.orderId,
-      vendorId:vendorData.vendor.id,    
+  for (const vendorData of result.vendors) {
+    notifyVendor(vendorData.vendor.id, {
+      type: "NEW_ORDER",
+      title: "New Order",
+      message: "you have received a new order",
+      orderId: result.orderId,
+      vendorId: vendorData.vendor.id,
     })
   }
+
+  // ==================================================
+  // CUSTOMER EMAIL
+  // ==================================================
+
+  const customer =
+    await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+
+      select: {
+        name: true,
+        email: true,
+      },
+    });
+
+
+  if (!customer) {
+    throw new Error(
+      "Customer not found."
+    );
+  }
+
+
+  const email =
+    orderPlacedEmail({
+      customerName:
+        customer.name,
+
+      orderId:
+        result.orderId,
+
+      orderNumber:
+        result.orderNumber,
+
+      grandTotal:
+        result.grandTotal,
+    });
+
+
+  await queueEmail({
+    to: customer.email,
+
+    subject:
+      email.subject,
+
+    text:
+      email.text,
+
+    html:
+      email.html,
+  });
 
   // ==================================================
   // SOCKET.IO EVENTS
@@ -402,20 +461,20 @@ export async function updateOrderStatusService(
   );
 
   notifyUser(order.userId, {
-  type: "ORDER_STATUS_UPDATED",
-  title: "Order Status Updated",
-  message: `Your order is now ${updatedOrder.status}.`,
-  orderId: updatedOrder.id,
-  status: updatedOrder.status,
-});
+    type: "ORDER_STATUS_UPDATED",
+    title: "Order Status Updated",
+    message: `Your order is now ${updatedOrder.status}.`,
+    orderId: updatedOrder.id,
+    status: updatedOrder.status,
+  });
 
-notifyAdmin({
-  type: "ORDER_STATUS_UPDATED",
-  title: "Order Status Updated",
-  message: `Order ${updatedOrder.orderNumber ?? updatedOrder.id} is now ${updatedOrder.status}.`,
-  orderId: updatedOrder.id,
-  status: updatedOrder.status,
-});
+  notifyAdmin({
+    type: "ORDER_STATUS_UPDATED",
+    title: "Order Status Updated",
+    message: `Order ${updatedOrder.orderNumber ?? updatedOrder.id} is now ${updatedOrder.status}.`,
+    orderId: updatedOrder.id,
+    status: updatedOrder.status,
+  });
 
 
   // ----------------------------------------------
