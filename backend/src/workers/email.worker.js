@@ -1,14 +1,7 @@
 import "dotenv/config";
-
 import { Worker } from "bullmq";
-
 import { connection } from "../config/queue.js";
-
-import {
-  sendOtpEmail,
-  sendPasswordResetEmail,
-  sendOrderConfirmationEmail,
-} from "../utils/mailer.js";
+import { sendOtpEmail, sendPasswordResetEmail, sendOrderConfirmationEmail, } from "../utils/mailer.js";
 
 const emailWorker = new Worker(
   "email-queue",
@@ -32,70 +25,72 @@ const emailWorker = new Worker(
       type
     );
 
-   switch (type) {
-  case "ORDER_PLACED": {
-    const {
-      to,
-      name,
-      orderNumber,
-      grandTotal,
-    } = job.data;
+    switch (type) {
+      case "ORDER_PLACED": {
+        const {
+          to,
+          name,
+          orderNumber,
+          grandTotal,
+        } = job.data;
 
-    await sendOrderConfirmationEmail({
-      to,
-      name,
-      orderNumber,
-      grandTotal,
-    });
+        await sendOrderConfirmationEmail({
+          to,
+          name,
+          orderNumber,
+          grandTotal,
+        });
 
-    console.log(
-      `✅ Order confirmation email sent to ${to}`
-    );
+        console.log(
+          `✅ Order confirmation email sent to ${to}`
+        );
 
-    break;
-  }
+        break;
+      }
 
-  case "OTP": {
-    const {
-      to,
-      ...data
-    } = job.data;
+      case "OTP": {
+        const {
+          to,
+          ...data
+        } = job.data;
 
-    await sendOtpEmail({
-      to,
-      ...data,
-    });
+        await sendOtpEmail({
+          to,
+          ...data,
+        });
 
-    console.log(
-      `✅ OTP email sent to ${to}`
-    );
+        console.log(
+          `✅ OTP email sent to ${to}`
+        );
 
-    break;
-  }
+        break;
+      }
 
-  case "PASSWORD_RESET": {
-    const {
-      to,
-      ...data
-    } = job.data;
+      case "PASSWORD_RESET": {
+        const {
+          to,
+          name,
+          resetUrl,
+        } = job.data;
 
-    await sendPasswordResetEmail({
-      to,
-      ...data,
-    });
+        await sendPasswordResetEmail({
+          to,
+          name,
+          resetUrl,
+        });
 
-    console.log(
-      `✅ Password reset email sent to ${to}`
-    );
+        console.log(
+          `✅ Password reset email sent to ${to}`
+        );
 
-    break;
-  }
+        break;
+      }
 
-  default:
-    throw new Error(
-      `Unknown email type: ${type}`
-    );
-}
+      default:
+        throw new Error(
+          `Unknown email type: ${type}`
+        );
+    }
 
     return {
       success: true,
