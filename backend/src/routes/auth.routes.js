@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { register, getMe, refreshToken, logout } from "../controllers/auth.controller.js";
-import { login } from "../controllers/auth.controller.js";
+import { login, forgotPasswordController } from "../controllers/auth.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import { registerSchema, loginSchema, refreshTokenSchema, logoutSchema ,} from "../validators/auth/auth.validation.js";
+import { registerSchema, loginSchema, refreshTokenSchema, logoutSchema, } from "../validators/auth/auth.validation.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/authorize.middleware.js";
 import { ROLES } from "../constants/auth/roles.js";
-import { createCategory, getCategoryById,updateCategory, deleteCategory, } from "../controllers/category.controller.js";
+import { createCategory, getCategoryById, updateCategory, deleteCategory, } from "../controllers/category.controller.js";
 import { createCategorySchema, updateCategorySchema } from "../validators/auth/category.validation.js";
 const router = Router();
 //Auth Routes
@@ -16,11 +16,11 @@ router.get("/admin", authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN), (r
 router.get('/me', authenticate, getMe);
 router.post('/refresh-token', validate(refreshTokenSchema), refreshToken);
 router.post("/logout", validate(logoutSchema), logout);
-
+router.post("/forgot-password", forgotPasswordController);
 //Products Route
-router.post("/create-category",validate(createCategorySchema),createCategory);
-router.get("/:id",getCategoryById);
-router.put("/:id",validate(updateCategorySchema),updateCategory);
-router.delete("/:id",deleteCategory);
+router.post("/create-category", validate(createCategorySchema), createCategory);
+router.get("/:id", getCategoryById);
+router.put("/:id", validate(updateCategorySchema), updateCategory);
+router.delete("/:id", deleteCategory);
 
 export default router;
