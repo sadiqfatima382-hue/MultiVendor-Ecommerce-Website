@@ -1,15 +1,7 @@
 import crypto from "crypto";
-
-import {
-  createOtp,
-  deleteUserOtps,
-  findValidOtp,
-  markOtpAsUsed,
-} from "../repositories/otp.repository.js";
-
-import { findUserById } from "../repositories/user.repository.js";
-
-import { queueEmail } from "../queues/email.jobs.js";
+import {  createOtp,  deleteUserOtps,  findValidOtp,  markOtpAsUsed,} from "../repositories/otp.repository.js";
+import { findUserById } from "../repositories/auth.repository.js";
+import { queueEmail } from "../queues/email.job.js";
 
 export async function generateEmailVerificationOtpService(
   userId
