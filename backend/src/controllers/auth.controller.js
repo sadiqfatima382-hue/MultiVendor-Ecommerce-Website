@@ -76,3 +76,21 @@ export async function logout(req, res, next) {
     });
   }
 }
+
+export async function forgotPasswordController(req, res) {
+  try {
+    const { email } = req.body;
+
+    const result = await forgotPasswordService(email);
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
