@@ -1,11 +1,18 @@
 import crypto from "crypto";
-import {  createOtp,  deleteUserOtps,  findValidOtp,  markOtpAsUsed,} from "../repositories/otp.repository.js";
+
+import {
+  createOtp,
+  deleteUserOtps,
+  findValidOtp,
+  markOtpAsUsed,
+} from "../repositories/otp.repository.js";
+
 import { findUserById } from "../repositories/user.repository.js";
+
 import { queueEmail } from "../queues/email.jobs.js";
 
-export async function generateOtpService(
-  userId,
-  type
+export async function generateEmailVerificationOtpService(
+  userId
 ) {
   const user = await findUserById(userId);
 
@@ -13,27 +20,26 @@ export async function generateOtpService(
     throw new Error("User not found.");
   }
 
-  // Remove previous OTPs of the same type
-  await deleteUserOtps(userId, type);
+  await deleteUserOtps(
+    userId,
+    "EMAIL_VERIFICATION"
+  );
 
-  // Generate 6-digit OTP
   const otp = crypto
     .randomInt(100000, 1000000)
     .toString();
 
-  // OTP expires in 10 minutes
   const expiresAt = new Date(
     Date.now() + 10 * 60 * 1000
   );
 
   await createOtp({
     code: otp,
-    type,
+    type: "EMAIL_VERIFICATION",
     userId,
     expiresAt,
   });
 
-  // Queue OTP email
   await queueEmail({
     type: "OTP",
     to: user.email,
@@ -66,7 +72,6 @@ export async function verifyOtpService(
   await markOtpAsUsed(otp.id);
 
   return {
-    success: true,
     message: "OTP verified successfully.",
   };
 }
