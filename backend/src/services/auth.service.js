@@ -1,8 +1,10 @@
+import crypto from "crypto";
 import { hashPassword, comparePassword } from "../utils/password.js";
 import { findUserByEmail, findRoleByName,createUser,} from "../repositories/auth.repository.js";
 import { verifyAccessToken, generateAccessToken,generateRefreshToken, verifyRefreshToken} from "../utils/jwt.js";
-import { findRefreshToken, createRefreshToken, deleteRefreshToken } from "../repositories/auth.repository.js";
+import { findRefreshToken, createRefreshToken, deleteRefreshToken , createPasswordResetToken,deletePasswordResetToken,} from "../repositories/auth.repository.js";
 import { ROLES } from "../constants/auth/roles.js";
+import {queueEmail} from "../queues/email.job.js"
 
 // Registration
 export async function registerUser(data) {
@@ -175,5 +177,46 @@ export async function logoutUser(data) {
 
   return {
     message: "Logged out successfully.",
+  };
+}
+
+export async function forgotPasswordService(email) {
+  const user = await findUserByEmail(email);
+
+  if (!user) {
+    return {
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
+    };
+  }
+
+  await deleteUserPasswordResetTokens(user.id);
+
+  const token =
+    crypto.randomBytes(32).toString("hex");
+
+  const expiresAt = new Date(
+    Date.now() + 15 * 60 * 1000
+  );
+
+  await createPasswordResetToken({
+    token,
+    userId: user.id,
+    expiresAt,
+  });
+
+  const resetUrl =
+    `${process.env.FRONTEND_URL}/reset-password/${token}`;
+
+  await queueEmail({
+    type: "PASSWORD_RESET",
+    to: user.email,
+    name: user.name,
+    resetUrl,
+  });
+
+  return {
+    message:
+      "If an account with that email exists, a password reset link has been sent.",
   };
 }
