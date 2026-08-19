@@ -51,12 +51,14 @@ const emailWorker = new Worker(
       case "OTP": {
         const {
           to,
-          ...data
+          name,
+          otp,
         } = job.data;
 
         await sendOtpEmail({
           to,
-          ...data,
+          name,
+          otp,
         });
 
         console.log(
