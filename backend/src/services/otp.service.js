@@ -45,3 +45,28 @@ export async function generateOtpService(
     message: "OTP sent successfully.",
   };
 }
+
+export async function verifyOtpService(
+  userId,
+  code,
+  type
+) {
+  const otp = await findValidOtp(
+    userId,
+    code,
+    type
+  );
+
+  if (!otp) {
+    throw new Error(
+      "Invalid or expired OTP."
+    );
+  }
+
+  await markOtpAsUsed(otp.id);
+
+  return {
+    success: true,
+    message: "OTP verified successfully.",
+  };
+}
