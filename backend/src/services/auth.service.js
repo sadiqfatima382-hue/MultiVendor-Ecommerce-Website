@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { hashPassword, comparePassword } from "../utils/password.js";
 import { findUserByEmail, findRoleByName,createUser,} from "../repositories/auth.repository.js";
 import { verifyAccessToken, generateAccessToken,generateRefreshToken, verifyRefreshToken} from "../utils/jwt.js";
-import { findRefreshToken, createRefreshToken, deleteRefreshToken , createPasswordResetToken,deletePasswordResetToken,} from "../repositories/auth.repository.js";
+import { findRefreshToken, createRefreshToken, deleteRefreshToken , createPasswordResetToken,deleteUserPasswordResetTokens,} from "../repositories/auth.repository.js";
 import { ROLES } from "../constants/auth/roles.js";
 import {queueEmail} from "../queues/email.job.js"
 
