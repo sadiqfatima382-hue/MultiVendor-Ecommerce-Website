@@ -1,5 +1,5 @@
 import { success } from "zod";
-import { registerUser, loginUser, refreshUserToken, logoutUser } from "../services/auth.service.js";
+import { registerUser, loginUser, refreshUserToken, logoutUser ,forgotPasswordService} from "../services/auth.service.js";
 // import { loginUser } from "../services/auth.service.js";
 
 export async function register(req, res, next) {
