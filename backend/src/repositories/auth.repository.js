@@ -86,3 +86,36 @@ export async function findUserWithRole(userId) {
     },
   });
 }
+
+export async function createPasswordResetToken(data) {
+  return prisma.passwordResetToken.create({
+    data,
+  });
+}
+
+export async function findPasswordResetToken(token) {
+  return prisma.passwordResetToken.findUnique({
+    where: {
+      token,
+    },
+    include: {
+      user: true,
+    },
+  });
+}
+
+export async function deletePasswordResetToken(token) {
+  return prisma.passwordResetToken.delete({
+    where: {
+      token,
+    },
+  });
+}
+
+export async function deleteUserPasswordResetTokens(userId) {
+  return prisma.passwordResetToken.deleteMany({
+    where: {
+      userId,
+    },
+  });
+}

@@ -219,9 +219,10 @@ model User {
   role Role @relation(fields: [roleId], references: [id])
 
   refreshTokens RefreshToken[]
-  otps          Otp[]
-  cart          Cart?
-  addresses     Address[]
+  otps                Otp[]
+  passwordResetTokens PasswordResetToken[]
+  cart                Cart?
+  addresses           Address[]
 
   createdAt                DateTime              @default(now())
   updatedAt                DateTime              @updatedAt
@@ -280,6 +281,22 @@ model Otp {
 
   @@index([userId])
   @@index([code])
+}
+
+model PasswordResetToken {
+  id String @id @default(cuid())
+
+  token String @unique
+
+  userId String
+  user   User @relation(fields: [userId],references: [id],onDelete: Cascade)
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model ProductCategory {
