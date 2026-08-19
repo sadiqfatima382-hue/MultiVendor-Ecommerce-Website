@@ -8,6 +8,7 @@ import { authorize } from "../middlewares/authorize.middleware.js";
 import { ROLES } from "../constants/auth/roles.js";
 import { createCategory, getCategoryById, updateCategory, deleteCategory, } from "../controllers/category.controller.js";
 import { createCategorySchema, updateCategorySchema } from "../validators/auth/category.validation.js";
+import { sendEmailVerificationOtpController } from "../controllers/otp.controller.js";
 const router = Router();
 //Auth Routes
 router.post("/register", validate(registerSchema), register);
@@ -17,6 +18,7 @@ router.get('/me', authenticate, getMe);
 router.post('/refresh-token', validate(refreshTokenSchema), refreshToken);
 router.post("/logout", validate(logoutSchema), logout);
 router.post("/forgot-password", forgotPasswordController);
+router.post(  "/send-email-verification-otp",  authenticate,  sendEmailVerificationOtpController);
 //Products Route
 router.post("/create-category", validate(createCategorySchema), createCategory);
 router.get("/:id", getCategoryById);
