@@ -46,7 +46,7 @@ import contactSettingRoutes from "./routes/contactSetting.routes.js";
 import blogPostRoutes from "./routes/blogPost.routes.js";
 import careerRoutes from "./routes/career.routes.js";
 import customerReturnRoutes from "./routes/customerReturn.routes.js";
-
+import stripeRoutes from "./routes/stripe.routes.js"
 const app = express();
 app.use("/api/payments/stripe", stripeRoutes);
 // Middleware
