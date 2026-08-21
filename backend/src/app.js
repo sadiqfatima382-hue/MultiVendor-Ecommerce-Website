@@ -48,7 +48,7 @@ import careerRoutes from "./routes/career.routes.js";
 import customerReturnRoutes from "./routes/customerReturn.routes.js";
 
 const app = express();
-
+app.use("/api/payments/stripe", stripeRoutes);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
