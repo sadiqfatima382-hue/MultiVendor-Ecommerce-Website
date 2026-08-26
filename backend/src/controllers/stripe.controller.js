@@ -1,12 +1,26 @@
 import stripe from "../config/stripe.js";
-import { updatePayment, findPaymentByOrderId, } from "../repositories/payment.repository.js";
-import { updateOrder, } from "../repositories/order.repository.js";
+
+import {
+  updatePayment,
+  findPaymentByOrderId,
+} from "../repositories/payment.repository.js";
+
+import {
+  updateOrder,
+} from "../repositories/order.repository.js";
+
 
 export async function stripeWebhook(req, res) {
   const signature =
     req.headers["stripe-signature"];
 
   let event;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Verify Stripe Webhook
+  |--------------------------------------------------------------------------
+  */
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -25,32 +39,50 @@ export async function stripeWebhook(req, res) {
     );
   }
 
+
+  /*
+  |--------------------------------------------------------------------------
+  | Process Stripe Event
+  |--------------------------------------------------------------------------
+  */
+
   try {
     switch (event.type) {
 
-      // ========================================
-      // PAYMENT SUCCEEDED
-      // ========================================
+      // =====================================================
+      // CHECKOUT COMPLETED
+      // =====================================================
 
-      case "payment_intent.succeeded": {
-        const paymentIntent =
+      case "checkout.session.completed": {
+
+        const session =
           event.data.object;
 
         const orderId =
-          paymentIntent.metadata?.orderId;
+          session.metadata?.orderId;
 
-        if (!orderId) {
+        const paymentId =
+          session.metadata?.paymentId;
+
+
+        if (!orderId || !paymentId) {
           console.error(
-            "❌ Stripe PaymentIntent has no orderId metadata."
+            "❌ Checkout Session is missing orderId or paymentId metadata."
           );
 
           break;
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Find Payment
+        |--------------------------------------------------------------------------
+        */
+
         const payment =
-          await findPaymentByOrderId(
-            orderId
-          );
+          await findPaymentByOrderId(orderId);
+
 
         if (!payment) {
           console.error(
@@ -60,7 +92,13 @@ export async function stripeWebhook(req, res) {
           break;
         }
 
-        // Prevent duplicate webhook processing
+
+        /*
+        |--------------------------------------------------------------------------
+        | Prevent Duplicate Processing
+        |--------------------------------------------------------------------------
+        */
+
         if (payment.status === "PAID") {
           console.log(
             `ℹ️ Payment already marked as PAID: ${payment.id}`
@@ -69,20 +107,37 @@ export async function stripeWebhook(req, res) {
           break;
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Payment
+        |--------------------------------------------------------------------------
+        */
+
         await updatePayment(
           payment.id,
           {
             status: "PAID",
 
             transactionId:
-              paymentIntent.id,
+              session.payment_intent,
+
+            stripeSessionId:
+              session.id,
 
             gatewayResponse:
-              paymentIntent,
+              session,
 
             paidAt: new Date(),
           }
         );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Order
+        |--------------------------------------------------------------------------
+        */
 
         await updateOrder(
           orderId,
@@ -91,37 +146,40 @@ export async function stripeWebhook(req, res) {
           }
         );
 
+
         console.log(
-          `✅ Stripe payment successful for order ${orderId}`
+          `✅ Stripe Checkout payment successful for order ${orderId}`
         );
 
         break;
       }
 
 
-      // ========================================
-      // PAYMENT FAILED
-      // ========================================
+      // =====================================================
+      // CHECKOUT EXPIRED
+      // =====================================================
 
-      case "payment_intent.payment_failed": {
-        const paymentIntent =
+      case "checkout.session.expired": {
+
+        const session =
           event.data.object;
 
         const orderId =
-          paymentIntent.metadata?.orderId;
+          session.metadata?.orderId;
+
 
         if (!orderId) {
           console.error(
-            "❌ Stripe PaymentIntent has no orderId metadata."
+            "❌ Expired Checkout Session has no orderId metadata."
           );
 
           break;
         }
 
+
         const payment =
-          await findPaymentByOrderId(
-            orderId
-          );
+          await findPaymentByOrderId(orderId);
+
 
         if (!payment) {
           console.error(
@@ -131,18 +189,31 @@ export async function stripeWebhook(req, res) {
           break;
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Don't change an already paid payment
+        |--------------------------------------------------------------------------
+        */
+
+        if (payment.status === "PAID") {
+          break;
+        }
+
+
         await updatePayment(
           payment.id,
           {
-            status: "FAILED",
+            status: "CANCELLED",
 
-            transactionId:
-              paymentIntent.id,
+            stripeSessionId:
+              session.id,
 
             gatewayResponse:
-              paymentIntent,
+              session,
           }
         );
+
 
         await updateOrder(
           orderId,
@@ -151,25 +222,33 @@ export async function stripeWebhook(req, res) {
           }
         );
 
+
         console.log(
-          `❌ Stripe payment failed for order ${orderId}`
+          `⚠️ Stripe Checkout expired for order ${orderId}`
         );
 
         break;
       }
 
 
+      // =====================================================
+      // DEFAULT
+      // =====================================================
+
       default:
+
         console.log(
           `ℹ️ Unhandled Stripe event: ${event.type}`
         );
     }
+
 
     return res.status(200).json({
       received: true,
     });
 
   } catch (error) {
+
     console.error(
       "❌ Stripe webhook processing error:",
       error

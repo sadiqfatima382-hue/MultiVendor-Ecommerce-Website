@@ -746,6 +746,7 @@ model Payment {
   status PaymentStatus @default(PENDING)
 
   transactionId String?
+  stripeSessionId String? @unique
 
   gatewayResponse Json?
 

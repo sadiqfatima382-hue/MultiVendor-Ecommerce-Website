@@ -48,7 +48,13 @@ import careerRoutes from "./routes/career.routes.js";
 import customerReturnRoutes from "./routes/customerReturn.routes.js";
 import stripeRoutes from "./routes/stripe.routes.js"
 const app = express();
-app.use("/api/payments/stripe", stripeRoutes);
+
+app.use(
+  "/api/payments/stripe/webhook",
+  express.raw({
+    type: "application/json",
+  })
+);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -99,6 +105,7 @@ app.use("/api/contact-settings", contactSettingRoutes);
 app.use("/api/blog-posts", blogPostRoutes);
 app.use("/api/careers", careerRoutes);
 app.use("/api/customer-returns", customerReturnRoutes);
+app.use("/api/payments/stripe", stripeRoutes);
 // Routes
 app.get("/", (req, res) => {
     res.json({

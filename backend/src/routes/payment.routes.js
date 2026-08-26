@@ -10,8 +10,9 @@ router.use(authenticate);
 
 router.post("/", validate(createPaymentSchema), createPayment);
 
+router.get("/order/:orderId", getPaymentByOrder);
+
 router.get("/:id", getPaymentById);
 
-router.get("/order/:orderId", getPaymentByOrder);
 
 export default router;
