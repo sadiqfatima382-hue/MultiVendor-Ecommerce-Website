@@ -60,104 +60,101 @@ export async function createPaymentService(
   // STRIPE
   // ==========================================
 
-if (method === "STRIPE") {
-  // Convert Decimal amount to number
-  const amount = Number(order.grandTotal);
+  if (method === "STRIPE") {
+    // Convert Decimal amount to number
+    const amount = Number(order.grandTotal);
 
-  if (!amount || amount <= 0) {
-    throw new Error("Invalid order amount.");
-  }
+    if (!amount || amount <= 0) {
+      throw new Error("Invalid order amount.");
+    }
 
-  // Stripe uses smallest currency unit.
-  // Example:
-  // $10.50 -> 1050 cents
-  const stripeAmount = Math.round(amount * 100);
+    // Stripe uses smallest currency unit.
+    // Example:
+    // $10.50 -> 1050 cents
+    const stripeAmount = Math.round(amount * 100);
 
-  // ==========================================
-  // Create database payment first
-  // ==========================================
+    // ==========================================
+    // Create database payment first
+    // ==========================================
 
-  const payment = await createPayment({
-    orderId,
+    const payment = await createPayment({
+      orderId,
 
-    amount: order.grandTotal,
+      amount: order.grandTotal,
 
-    method: "STRIPE",
+      method: "STRIPE",
 
-    status: "PENDING",
-  });
+      status: "PENDING",
+    });
 
-  // ==========================================
-  // Create Stripe Checkout Session
-  // ==========================================
+    // ==========================================
+    // Create Stripe Checkout Session
+    // ==========================================
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
 
-    line_items: [
-      {
-        price_data: {
-          currency:
-            process.env.STRIPE_CURRENCY || "usd",
+      line_items: [
+        {
+          price_data: {
+            currency:
+              process.env.STRIPE_CURRENCY || "usd",
 
-          product_data: {
-            name: `Order #${orderId}`,
+            product_data: {
+              name: `Order #${orderId}`,
+            },
+
+            unit_amount: stripeAmount,
           },
 
-          unit_amount: stripeAmount,
+          quantity: 1,
         },
+      ],
 
-        quantity: 1,
+      metadata: {
+        orderId,
+        paymentId: payment.id,
+        userId,
       },
-    ],
 
-    metadata: {
-      orderId,
-      paymentId: payment.id,
-      userId,
-    },
+      success_url:`${process.env.CLIENT_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:`${process.env.CLIENT_URL}/payment/cancel`,
+    });
 
-    success_url:
-      `${process.env.CLIENT_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+    // ==========================================
+    // Save Stripe Checkout Session ID
+    // ==========================================
 
-    cancel_url:
-      `${process.env.CLIENT_URL}/payment/cancel`,
-  });
+    const updatedPayment = await updatePayment(
+      payment.id,
+      {
+        stripeSessionId: session.id,
+      }
+    );
 
-  // ==========================================
-  // Save Stripe Checkout Session ID
-  // ==========================================
+    // ==========================================
+    // Update Order
+    // ==========================================
 
-  const updatedPayment = await updatePayment(
-    payment.id,
-    {
-      stripeSessionId: session.id,
-    }
-  );
+    await updateOrder(orderId, {
+      paymentMethod: "STRIPE",
+      paymentStatus: "PENDING",
+    });
 
-  // ==========================================
-  // Update Order
-  // ==========================================
+    // ==========================================
+    // Return Checkout URL
+    // ==========================================
 
-  await updateOrder(orderId, {
-    paymentMethod: "STRIPE",
-    paymentStatus: "PENDING",
-  });
+    return {
+      payment: updatedPayment,
 
-  // ==========================================
-  // Return Checkout URL
-  // ==========================================
+      paymentRequired: true,
 
-  return {
-    payment: updatedPayment,
+      checkoutUrl: session.url,
 
-    paymentRequired: true,
-
-    checkoutUrl: session.url,
-
-    sessionId: session.id,
-  };
-}
+      sessionId: session.id,
+    };
+  }
   // ==========================================
   // Unsupported method
   // ==========================================

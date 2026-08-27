@@ -1,14 +1,6 @@
 import stripe from "../config/stripe.js";
-
-import {
-  updatePayment,
-  findPaymentByOrderId,
-} from "../repositories/payment.repository.js";
-
-import {
-  updateOrder,
-} from "../repositories/order.repository.js";
-
+import { updatePayment, findPaymentByOrderId, } from "../repositories/payment.repository.js";
+import { updateOrder, } from "../repositories/order.repository.js";
 
 export async function stripeWebhook(req, res) {
   const signature =

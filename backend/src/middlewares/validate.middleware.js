@@ -20,7 +20,7 @@ export const validate = (schema) => {
         data = req.body;
       }
       console.log(req.body);
-console.log(typeof req.body.type);
+// console.log(typeof req.body.type);
       req.validatedData = await schema.parseAsync(data);
 
       next();

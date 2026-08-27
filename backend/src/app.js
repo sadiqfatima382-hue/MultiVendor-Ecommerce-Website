@@ -114,4 +114,19 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/payment/success", (req, res) => {
+    res.json({
+        success: true,
+        message: "Payment completed successfully.",
+        sessionId: req.query.session_id,
+    });
+});
+
+app.get("/payment/cancel", (req, res) => {
+    res.json({
+        success: false,
+        message: "Payment was cancelled.",
+    });
+});
+
 export default app;
