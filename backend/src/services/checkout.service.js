@@ -23,7 +23,7 @@ async function validateCartItems(cartItems) {
       );
     }
 
-    // Variant status (if your schema has it)
+    // Variant status 
     if (
       variant.status &&
       variant.status !== "ACTIVE"

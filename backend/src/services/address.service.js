@@ -12,8 +12,6 @@ export async function createAddressService(userId, data) {
         addressData.isDefault = true;
     }
 
-    // If user explicitly wants this as default,
-    // remove default from all other addresses
     if (addressData.isDefault) {
         await clearDefaultAddress(userId);
     }
